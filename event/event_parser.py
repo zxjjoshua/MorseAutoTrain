@@ -1,8 +1,20 @@
 from record import Record
 import numpy as np
+# from DataRead import processNodeSet, fileNodeSet
+import data_read
+from logging import getLogger
+from filenode import FileNode
+from processnode import ProcessNode
+from event.event_processor import *
+import logging
+from globals import GlobalVariable as gv
+
+logger=getLogger("EventParser")
 
 class EventParser:
-    def parse(self, record: Record):
+    @staticmethod
+    def parse(record: Record):
+        vector: np.array
         if record.subtype == 1:
             pass
         elif record.subtype == 2:
@@ -10,6 +22,10 @@ class EventParser:
         elif record.subtype == 3:
             pass
         elif record.subtype == 4:
+            vector = EventParser.process2file_parser(record)
+            if vector is None:
+                return
+            EventProcessor.read_process(vector)
             pass
         elif record.subtype == 5:
             pass
@@ -18,6 +34,7 @@ class EventParser:
         elif record.subtype == 7:
             pass
         elif record.subtype == 8:
+            EventParser.file2process_parser(record)
             pass
         elif record.subtype == 9:
             pass
@@ -56,6 +73,7 @@ class EventParser:
         elif record.subtype == 26:
             pass
         elif record.subtype == 27:
+            EventParser.process2file_parser(record)
             pass
         elif record.subtype == 28:
             pass
@@ -78,13 +96,91 @@ class EventParser:
         elif record.subtype == 37:
             pass
 
-    def parse_sys_create(self, record: Record):
-        if record.subtype!=27:
+
+    @staticmethod
+    def file2process_parser(record):
+        id = record.Id
+        time = record.time
+        subtype = record.subtype
+        srcNode: FileNode
+        destNode: ProcessNode
+        if not gv.exist_fileNode(record.srcId):
+            logger.error("file to process, can't find srcNode "+ str(record.srcId))
             return None
-        if record.srcid==-1:
+        else:
+            srcNode = gv.get_fileNode(record.srcId)
+        if not gv.exist_processNode(record.desId):
+            logger.error("file to process, can't find desNode "+ str(record.desId))
             return None
-        srcid=record.srcId
-        desid=record.desId
+        else:
+            destNode = gv.get_processNode(record.desId)
+        if not srcNode or not destNode:
+            logger.error("file to process, can't find srcNode or destNode "+' '+str(record.srcId)+' '+ str(record.desId))
+            return None
+
+        eventArray = [id, time, subtype, 0]
+        params = record.params+[0]*(4-len(record.params))
+        srcArray = srcNode.getMatrixArray(4)
+        desArray = destNode.getMatrixArray(4)
+        return np.array([eventArray, params, srcArray, desArray])
+
+
+    @staticmethod
+    def process2file_parser(record):
+        id = record.Id
+        time = record.time
+        subtype = record.subtype
+        srcNode: ProcessNode = None
+        destNode: FileNode = None
+        if not gv.exist_processNode(record.srcId):
+            logger.error("process to file, can't find srcNode "+ str(record.srcId))
+            return None
+        else:
+            srcNode = gv.get_processNode(record.srcId)
+        if not gv.exist_fileNode(record.desId):
+            logger.error("process to file, can't find desNode"+ ' '+ str(record.desId))
+            return None
+        else:
+            destNode = gv.get_fileNode(record.desId)
+        if not srcNode or not destNode:
+            logger.error("process to file, can't find desNode or destNode "+ str(record.srcId)+' '+ str(record.desId))
+            return None
+
+        eventArray = [id, time, subtype, 0]
+        params = record.params + [0] * (4 - len(record.params))
+        srcArray = srcNode.getMatrixArray(4)
+        desArray = destNode.getMatrixArray(4)
+        return np.array([eventArray, params, srcArray, desArray])
+
+    @staticmethod
+    def file2file_parser(record):
+        id = record.Id
+        time = record.time
+        subtype = record.subtype
+        srcNode: FileNode = None
+        destNode: FileNode = None
+        if not gv.exist_fileNode(record.srcId):
+            logger.error("file to file, can't find srcNode"+' '+  str(record.srcId))
+            return None
+        else:
+            srcNode = gv.get_fileNode(record.srcId)
+        if not gv.exist_fileNode(record.desId):
+            logger.error("file to file, can't find desNode"+' '+  str(record.desId))
+            return None
+        else:
+            destNode=gv.get_fileNode(record.desId)
+        if not srcNode or not destNode:
+            logger.error("file to file, can't find desNode or destNode"+' '+  str(record.srcId)+' '+  str(record.desId))
+            return None
+
+        eventArray = [id, time, subtype, 0]
+        params = record.params + [0] * (4 - len(record.params))
+        srcArray = srcNode.getMatrixArray(4)
+        desArray = destNode.getMatrixArray(4)
+        return np.array([eventArray, params, srcArray, desArray])
+
+
+
 
 
 

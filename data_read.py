@@ -1,10 +1,21 @@
+from typing import Dict, Any
 import numpy as np
 from record import Record
 from logging import getLogger
+import event.event_parser as ep
+import logging
+from processnode import ProcessNode
+from filenode.file_node import FileNode
+from globals import GlobalVariable as gv
 
+logger=getLogger("dataRead")
+# processNodeSet: Dict[int, ProcessNode]={}
+# fileNodeSet: Dict[int, FileNode]={}
+# global processNodeSet
+# global fileNodeSet
 processNodeSet={}
 fileNodeSet={}
-logger=getLogger("dataRead")
+
 
 def dataRead(fileName):
     f = open(fileName, "r")
@@ -18,33 +29,35 @@ def dataRead(fileName):
             record=readObj(f)
             if record.type==1:
                 # event type
-                pass
-
-            elif record.type==-1 and record.subtype==5 and not record.params:
-                # event
+                ep.EventParser.parse(record)
                 pass
             elif record.type==-1:
+                # file node
                 if record.subtype>0 and record.subtype<5:
                     newNode=record.getFileNode()
                     if not newNode:
                         logger.error("failed to get file node")
                         continue
-                    if newNode.id in fileNodeSet:
+                    if gv.exist_fileNode(newNode.id):
                         logger.error("duplicate file node: " + str(newNode.id))
                     else:
-                        fileNodeSet[newNode.id]=newNode
+                        gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype==5:
+                    # process node
+                    # if no params, this process is released
+                    if not record.params:
+                        remove_process_node(record.Id)
+                        continue
                     newNode = record.getProcessNode()
                     if not newNode:
                         logger.error("failed to get process node")
-                        break
                         continue
-                    if newNode.id in processNodeSet:
+                    if gv.exist_processNode(newNode.id):
                         logger.error("duplicate process node: "+newNode.id)
                     else:
-                        processNodeSet[newNode.id] = newNode
+                        gv.set_processNode(newNode.id, newNode)
         i+=1
-        # if i>10000:
+        # if i>5000:
         #     break
 
 def readObj(f):
@@ -82,15 +95,21 @@ def readObj(f):
             elif words[0]=="size":
                 event.size=int(words[1])
             elif words[0]=="srcId":
-                event.srcId=words[1]
+                event.srcId=int(words[1])
             elif words[0]=="desId":
-                event.desId = words[1]
-    if event.Id==99712:
-        logger.info(params)
+                event.desId = int(words[1])
     if params:
         event.params=params
     return event
 
+
+def remove_file_node(id: int):
+    if id in fileNodeSet:
+        fileNodeSet.pop(id)
+
+def remove_process_node(id: int):
+    if id in processNodeSet:
+        processNodeSet.pop(id)
 
 def pruningStr(line):
     if not line:
@@ -109,6 +128,22 @@ def pruningStr(line):
         return line[start:-1]
     return line[start:]
 
+
+def exits_in_processNodeSet(key):
+    return key in processNodeSet
+
+def exist_in_fileNodeSett(key):
+    return key in fileNodeSet
+
+def getquote():
+    # global quoted
+    return quoted
+
+def set_quoted():
+    quoted="no hello"
+
+
 if __name__=="__main__":
+    logging.basicConfig(level=logging.INFO)
     dataRead("./EventData/debug.out")
 
