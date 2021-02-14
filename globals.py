@@ -30,6 +30,10 @@ class GlobalVariable:
     def exist_fileNode(cls, index: int)-> bool:
         return True if index in cls.fileNodeSet else False
 
+    @classmethod
+    def remove_fileNode(cls, index: int):
+        if index in cls.fileNodeSet:
+            cls.fileNodeSet.pop(index)
 
     @classmethod
     def get_processNode(cls, index: int) -> ProcessNode:
@@ -42,4 +46,9 @@ class GlobalVariable:
     @classmethod
     def exist_processNode(cls, index: int) -> bool:
         return True if index in cls.processNodeSet else False
+
+    @classmethod
+    def remove_processNode(cls, index: int):
+        if index in cls.processNodeSet:
+            cls.processNodeSet.pop(index)
 
