@@ -13,8 +13,8 @@ class Record:
         self.type:int
         self.subtype:int
         self.size:int
-        self.desId:str
-        self.srcId:str
+        self.desId:int
+        self.srcId:int
         self.params:list
 
         self.Id = -1
@@ -22,8 +22,8 @@ class Record:
         self.subtype = -1
         self.type=-1
         self.size = -1
-        self.desId=""
-        self.srcId=""
+        self.desId=-1
+        self.srcId=-1
         self.params = []
 
 
@@ -80,7 +80,7 @@ class Record:
             return None
         if len(self.params)!=4:
             logger.error("lack of params")
-            print(self.Id, self.type, self.subtype, self.params)
+            # print(self.Id, self.type, self.subtype, self.params)
             return None
         processNode=ProcessNode(self.Id, self.time, self.type, self.subtype, self.params[0],self.params[1],self.params[2],self.params[3])
         return processNode

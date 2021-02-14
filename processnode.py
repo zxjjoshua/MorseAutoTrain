@@ -14,4 +14,7 @@ class ProcessNode:
         self.cTag: float = 0.0
 
 
-
+    def getMatrixArray(self, padding: 4):
+        if padding<4:
+            return None
+        return [self.subtype, self.sTag, self.iTag, self.cTag]+[0]*(padding-4)
