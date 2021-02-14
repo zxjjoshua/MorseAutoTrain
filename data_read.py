@@ -57,8 +57,8 @@ def dataRead(fileName):
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i+=1
-        if i>5000:
-            break
+        # if i>5000:
+        #     break
 
 def readObj(f):
     event=Record()

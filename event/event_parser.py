@@ -23,7 +23,7 @@ class EventParser:
             pass
         elif record.subtype == 4:
             vector = EventParser.process2file_parser(record)
-            if not vector:
+            if vector is None:
                 return
             EventProcessor.read_process(vector)
             pass
