@@ -46,7 +46,7 @@ def dataRead(fileName):
                     # process node
                     # if no params, this process is released
                     if not record.params:
-                        remove_process_node(record.Id)
+                        gv.remove_processNode(record.Id)
                         continue
                     newNode = record.getProcessNode()
                     if not newNode:
@@ -129,18 +129,7 @@ def pruningStr(line):
     return line[start:]
 
 
-def exits_in_processNodeSet(key):
-    return key in processNodeSet
 
-def exist_in_fileNodeSett(key):
-    return key in fileNodeSet
-
-def getquote():
-    # global quoted
-    return quoted
-
-def set_quoted():
-    quoted="no hello"
 
 
 if __name__=="__main__":
