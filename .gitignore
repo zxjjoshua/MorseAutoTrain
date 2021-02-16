@@ -1,4 +1,13 @@
-**/__pycache__/**
-__pycche__/**
+# python cache
+**/__pycache/
+__pycache__/
+__pycache__/data_read.cpython-37.pyc
+
+# idea file
 .idea/**
+
+# Mac File
 .DS_Store
+
+# data file
+/EventData
