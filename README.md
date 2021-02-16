@@ -4,7 +4,7 @@
 We have 2 data sample in EventData/. you can set set data to run by setting file path in __main__() of data_read.py.
 
 ### how to run
-1. 
+1. install dependency numpy==1.19.4, scipy==1.5.4
 2. set data_read.py as main script, and run.
 
 ### main functions
