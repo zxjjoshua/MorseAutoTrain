@@ -47,6 +47,10 @@ class EventParser:
         elif record.subtype == 13:
             pass
         elif record.subtype == 14:
+            vector = EventParser.process2process_parser(record)
+            if vector is None:
+                return
+            EventProcessor.exec_process(vector)
             pass
         elif record.subtype == 15:
             pass
@@ -90,6 +94,10 @@ class EventParser:
         elif record.subtype == 34:
             pass
         elif record.subtype == 35:
+            vector = EventParser.process2file_parser(record)
+            if vector is None:
+                return
+            EventProcessor.load_process(vector)
             pass
         elif record.subtype == 36:
             pass
@@ -144,6 +152,34 @@ class EventParser:
             destNode = gv.get_fileNode(record.desId)
         if not srcNode or not destNode:
             logger.error("process to file, can't find desNode or destNode "+ str(record.srcId)+' '+ str(record.desId))
+            return None
+
+        eventArray = [id, time, subtype, 0]
+        params = record.params + [0] * (4 - len(record.params))
+        srcArray = srcNode.getMatrixArray(4)
+        desArray = destNode.getMatrixArray(4)
+        return np.array([eventArray, params, srcArray, desArray])
+
+    @staticmethod
+    def process2process_parser(record):
+        id = record.Id
+        time = record.time
+        subtype = record.subtype
+        srcNode: ProcessNode = None
+        destNode: ProcessNode = None
+        if not gv.exist_processNode(record.srcId):
+            logger.error("process to process, can't find srcNode " + str(record.srcId))
+            return None
+        else:
+            srcNode = gv.get_processNode(record.srcId)
+        if not gv.exist_processNode(record.desId):
+            logger.error("process to process, can't find desNode" + ' ' + str(record.desId))
+            return None
+        else:
+            destNode = gv.get_processNode(record.desId)
+        if not srcNode or not destNode:
+            logger.error(
+                "process to process, can't find desNode or destNode " + str(record.srcId) + ' ' + str(record.desId))
             return None
 
         eventArray = [id, time, subtype, 0]
