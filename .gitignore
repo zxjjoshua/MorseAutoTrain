@@ -9,5 +9,5 @@ __pycache__/data_read.cpython-37.pyc
 # Mac File
 .DS_Store
 
-# data file
-/EventData
+# log file
+*.log
