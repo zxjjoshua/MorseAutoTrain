@@ -196,7 +196,7 @@ class EventParser:
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
-    def process2process_parser(record):
+    def process2process_parser(record: Record)->np.array:
         id = record.Id
         time = record.time
         subtype = record.subtype

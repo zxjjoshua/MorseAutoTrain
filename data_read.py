@@ -133,6 +133,7 @@ def pruningStr(line):
 
 
 if __name__=="__main__":
-    logging.basicConfig(level=logging.INFO)
-    dataRead("./EventData/debug.out")
+    logging.basicConfig(level=logging.INFO, filename='debug.log')
+
+    dataRead("./EventData/north_korea_apt_attack_data_debug.out")
 
