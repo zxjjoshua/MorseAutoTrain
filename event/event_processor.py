@@ -17,6 +17,7 @@ class EventProcessor:
         # tags structure
         # srcNode: sTag iTag cTag
         # desNode: sTag iTag cTag
+        vector.astype(np.float)
         left_matrix = np.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags=np.dot(np.dot(left_matrix,vector),right_matrix)
@@ -26,6 +27,7 @@ class EventProcessor:
 
     @staticmethod
     def write_process(vector: np.array):
+        vector.astype(np.float)
         left_matrix = np.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags = np.dot(np.dot(left_matrix, vector), right_matrix)
@@ -44,6 +46,7 @@ class EventProcessor:
 
     @staticmethod
     def create_process(vector: np.array):
+        vector.astype(np.float)
         left_matrix = np.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags = np.dot(np.dot(left_matrix, vector), right_matrix)
