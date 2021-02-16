@@ -11,3 +11,6 @@ __pycache__/data_read.cpython-37.pyc
 
 # log file
 *.log
+
+# venv
+/venv/
