@@ -162,7 +162,7 @@ class EventParser:
         eventArray = [id, time, subtype, 0]
         params = record.params + [0] * (4 - len(record.params))
         srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
+        desArray = destNode.get_matrix_array(4)
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -191,7 +191,7 @@ class EventParser:
 
         eventArray = [id, time, subtype, 0]
         params = record.params + [0] * (4 - len(record.params))
-        srcArray = srcNode.getMatrixArray(4)
+        srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.getMatrixArray(4)
         return np.array([eventArray, params, srcArray, desArray])
 
@@ -219,8 +219,8 @@ class EventParser:
 
         eventArray = [id, time, subtype, 0]
         params = record.params + [0] * (4 - len(record.params))
-        srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
+        srcArray = srcNode.get_matrix_array(4)
+        desArray = destNode.get_matrix_array(4)
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod

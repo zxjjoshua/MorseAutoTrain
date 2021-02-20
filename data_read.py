@@ -133,7 +133,11 @@ def pruningStr(line):
 
 
 if __name__=="__main__":
-    logging.basicConfig(level=logging.INFO, filename='debug.log')
+    logging.basicConfig(level=logging.INFO,
+                        filename='debug.log',
+                        filemode='w+',
+                        format='%(asctime)s %(levelname)s:%(message)s',
+                        datefmt='%m/%d/%Y %I:%M:%S %p')
 
     dataRead("./EventData/north_korea_apt_attack_data_debug.out")
 
