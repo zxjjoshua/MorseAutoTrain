@@ -8,6 +8,7 @@ from processnode import ProcessNode
 from event.event_processor import *
 import logging
 from globals import GlobalVariable as gv
+from target import Target as tg
 
 logger = getLogger("EventParser")
 
@@ -50,25 +51,25 @@ class EventParser:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector)
+            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
             pass
         elif record.subtype == 9:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector)
+            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
             pass
         elif record.subtype == 10:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector)
+            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
             pass
         elif record.subtype == 11:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector)
+            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
             pass
         elif record.subtype == 12:
             pass
@@ -78,7 +79,7 @@ class EventParser:
             vector = EventParser.process2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.exec_process(vector)
+            EventProcessor.exec_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env())
             pass
         elif record.subtype == 15:
             pass
