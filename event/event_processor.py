@@ -61,6 +61,7 @@ class EventProcessor:
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
         jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags[:, 1:3], axis=0))
+        tags = jnp.concatenate(vector, tags)
         return tags
 
     # @staticmethod
@@ -102,14 +103,13 @@ class EventProcessor:
         if tags[0][0] >= benign:
             attenuation = jnp.array([[0, a_b, a_b], [0, 0, 0]])
             jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation, axis=0)[1:3])
-            return tags
         elif tags[0][0] >= suspect_env:
             attenuation = jnp.array([[0, a_e, a_e], [0, 0, 0]])
             jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation, axis=0)[1:3])
-            return tags
         else:
             jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags[:, 1:3], axis=0))
-            return tags
+        tags = jnp.concatenate(vector, tags)
+        return tags
 
     # @staticmethod
     # def create_process(vector: np.array):
@@ -128,9 +128,9 @@ class EventProcessor:
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
         tags[0][1:3] = tags[1][:, 1:3]
+        tags = jnp.concatenate(vector, tags)
 
         return tags
-        pass
 
     # @staticmethod
     # def load_process(vector: np.array):
@@ -155,6 +155,7 @@ class EventProcessor:
                                  jnp.minimum(tags[0, 1], tags[1, 1]) - tags[0, 1],
                                  jnp.minimum(tags[0, 2], tags[1, 2]) - tags[0, 2]],
                                 [0.0, 0.0, 0.0]])
+        res = jnp.concatenate(tags, res)
         return res
 
     # @staticmethod
@@ -208,8 +209,29 @@ class EventProcessor:
                                      jnp.minimum(tags[0, 1], tags[1, 1]) - tags[0, 1],
                                      jnp.minimum(tags[0, 2], tags[1, 2]) - tags[0, 2]],
                                     [0, 0, 0]])
+        res = jnp.concatenate(tags, res)
         return res
 
     @staticmethod
     def inject_process(vector: jnp.array):
         pass
+
+
+def get_read_grad(vector: jnp.array):
+    return jacrev(EventProcessor.read_process)(vector)
+
+
+def get_write_grad(vector: jnp.array):
+    return jacrev(EventProcessor.write_process())(vector)
+
+
+def get_create_grad(vector: jnp.array):
+    return jacrev(EventProcessor.create_process())(vector)
+
+
+def get_load_grad(vector: jnp.array):
+    return jacrev(EventProcessor.load_process())(vector)
+
+
+def get_exec_grad(vector: jnp.array):
+    return jacrev(EventProcessor.exec_process())(vector)

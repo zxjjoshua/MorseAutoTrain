@@ -42,6 +42,9 @@ def dataRead(fileName):
                         logger.error("duplicate file node: " + str(newNode.id))
                     else:
                         gv.set_fileNode(newNode.id, newNode)
+                elif record.subtype==-1:
+                    # common file
+                    newNode = record.getFileNode()
                 elif record.subtype==5:
                     # process node
                     # if no params, this process is released

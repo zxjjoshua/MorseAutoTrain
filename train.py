@@ -79,7 +79,17 @@ class Train:
     def back_propagate(self, case, label, learn, correct):
         # feed forward, get the predicted result
         res = self.forward(case)
+        # Morse
+        # RNN
 
+        # loss from one_class
+        # update RNN with loss
+        # update Morse with loss
+        # weight=[benign_thresh]
+        #   1. grad=get_read_grad(case)*RNN.grad
+        #   2. weight=weight- a*grad, i.e, benign_thresh= benign_thresh - a*grad[0][0]
+        #   ( SGD vs Batch, SGD can improve the speed of training)
+        # loop
 
 
 
@@ -96,6 +106,9 @@ class Train:
             for o in range(self.output_n):
                 error += output_deltas[o] * self.output_weights[h][o]
             hidden_deltas[h] = sigmod_derivative(self.hidden_cells[h]) * error
+
+
+
         # update output weights
         for h in range(self.hidden_n):
             for o in range(self.output_n):

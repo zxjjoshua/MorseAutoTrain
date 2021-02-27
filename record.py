@@ -38,11 +38,18 @@ class Record:
         if self.type != -1:
             return None
         try:
-            if self.subtype == 1:
+            if self.subtype == -1:
                 if (len(self.params) != 1):
                     return None
                 res = CommonFile(self.Id, self.time, self.type, self.subtype, self.params[0])
                 return res
+            elif self.subtype == 1:
+                #shared memory
+                # if (len(self.params) != 1):
+                #     return None
+                # res = CommonFile(self.Id, self.time, self.type, self.subtype, self.params[0])
+                # return res
+                pass
             elif self.subtype == 2:
                 if (len(self.params) != 1):
                     return None
