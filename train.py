@@ -1,6 +1,6 @@
 import numpy as np
 import math
-
+import morse_train
 
 def rand(a, b):
     return (b - a) * np.random.random() + a
@@ -56,8 +56,6 @@ class Train:
                         self.input_correction = make_matrix(self.input_n, self.hidden_n)
                         self.output_correction = make_matrix(self.hidden_n, self.output_n)
 
-
-
     def forward(self, inputs):
         # activate input layer
         for i in range(self.input_n - 1):
@@ -76,54 +74,24 @@ class Train:
             self.output_cells[k] = sigmoid(total)
         return self.output_cells[:]
 
-    def back_propagate(self, case, label, learn, correct):
+    def back_propagate(case, label, learn, correct):
         # feed forward, get the predicted result
-        res = self.forward(case)
-        # Morse
-        # RNN
+        # res = self.forward(case)
 
-        # loss from one_class
-        # update RNN with loss
-        # update Morse with loss
-        # weight=[benign_thresh]
-        #   1. grad=get_read_grad(case)*RNN.grad
-        #   2. weight=weight- a*grad, i.e, benign_thresh= benign_thresh - a*grad[0][0]
-        #   ( SGD vs Batch, SGD can improve the speed of training)
-        # loop
+        # Morse_res = Morse.forward()
+        # RNN_res=RNN.forward(Morse_res)
 
+        # loss = calculate_loss(RNN_res)
+        rnn_grad: np.array(4,3)
+        # rnn_grad = calculate_loss_grad(loss)
 
+        Morse_loss: np.array
+        # Morse_grad = morse_train.back_propagate(RNN_grad, case)
 
-        # get output layer error
-        output_deltas = [0.0] * self.output_n
-        for o in range(self.output_n):
-            error = label[o] - self.output_cells[o]
-            output_deltas[o] = sigmod_derivative(self.output_cells[o]) * error
+        subtype=case[0][0]
+        final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
 
-        # get hidden layer error
-        hidden_deltas = [0.0] * self.hidden_n
-        for h in range(self.hidden_n):
-            error = 0.0
-            for o in range(self.output_n):
-                error += output_deltas[o] * self.output_weights[h][o]
-            hidden_deltas[h] = sigmod_derivative(self.hidden_cells[h]) * error
+        # update weights
+        # weights=learning_rate*final_grad+weights
 
-
-
-        # update output weights
-        for h in range(self.hidden_n):
-            for o in range(self.output_n):
-                change = output_deltas[o] * self.hidden_cells[h]
-                self.output_weights[h][o] += learn * change + correct * self.output_correction[h][o]
-                self.output_correction[h][o] = change
-        # update input weights
-        for i in range(self.input_n):
-            for h in range(self.hidden_n):
-                change = hidden_deltas[h] * self.input_cells[i]
-                self.input_weights[i][h] += learn * change + correct * self.input_correction[i][h]
-                self.input_correction[i][h] = change
-        # get global error
-        error = 0.0
-        for o in range(len(label)):
-            error += 0.5 * (label[o] - self.output_cells[o]) ** 2
-        return error
 

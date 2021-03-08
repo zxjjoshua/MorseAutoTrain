@@ -221,17 +221,26 @@ def get_read_grad(vector: jnp.array):
     return jacrev(EventProcessor.read_process)(vector)
 
 
-def get_write_grad(vector: jnp.array):
-    return jacrev(EventProcessor.write_process())(vector)
+def get_write_grad(vector: jnp.array,
+                   benign: float,
+                   suspect_env: float,
+                   a_b: float,
+                   a_e: float
+                   ):
+    return jacrev(EventProcessor.write_process)(vector, benign, suspect_env, a_b, a_e)
+    # jacobian matrix
+    # write_process -> 4x3 matrix [previous tags, updated tags]
 
 
 def get_create_grad(vector: jnp.array):
-    return jacrev(EventProcessor.create_process())(vector)
+    return jacrev(EventProcessor.create_process)(vector)
 
 
 def get_load_grad(vector: jnp.array):
-    return jacrev(EventProcessor.load_process())(vector)
+    return jacrev(EventProcessor.load_process)(vector)
 
 
-def get_exec_grad(vector: jnp.array):
-    return jacrev(EventProcessor.exec_process())(vector)
+def get_exec_grad(vector: jnp.array,
+                  benign: float,
+                  suspect_env):
+    return jacrev(EventProcessor.exec_process)(vector, benign, suspect_env)
