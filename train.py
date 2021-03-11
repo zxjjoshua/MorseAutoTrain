@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import morse_train
+from processnode import ProcessNode
 
 def rand(a, b):
     return (b - a) * np.random.random() + a
@@ -18,6 +19,7 @@ def sigmoid(x):
 
 def sigmod_derivative(x):
     return x * (1 - x)
+
 
 class Train:
 
@@ -74,12 +76,38 @@ class Train:
             self.output_cells[k] = sigmoid(total)
         return self.output_cells[:]
 
-    def back_propagate(case, label, learn, correct):
-        # feed forward, get the predicted result
-        # res = self.forward(case)
 
-        # Morse_res = Morse.forward()
-        # RNN_res=RNN.forward(Morse_res)
+def back_propagate(case, learn):
+    # feed forward, get the predicted result
+    # res = self.forward(case)
+
+    # Morse_res = Morse.forward()
+    # generate sequence
+    # RNN_res=RNN.forward(Morse_res)
+
+    # loss = calculate_loss(RNN_res)
+    rnn_grad: np.array(4,3)
+    # rnn_grad = calculate_loss_grad(loss)
+
+    Morse_loss: np.array
+    # Morse_grad = morse_train.back_propagate(RNN_grad, case)
+
+    subtype=case[0][0]
+    final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
+
+    # update weights
+    # weights=learning_rate*final_grad+weights
+
+
+def back_propagate_batch(learn, node_list: list[ProcessNode]):
+    # feed forward, get the predicted result
+    # res = self.forward(case)
+
+    # generate sequence
+    for node in node_list:
+        sequence = node.generate_sequence()
+        # RNN_res = RNN.forward(sequence)
+
 
         # loss = calculate_loss(RNN_res)
         rnn_grad: np.array(4,3)
@@ -88,8 +116,7 @@ class Train:
         Morse_loss: np.array
         # Morse_grad = morse_train.back_propagate(RNN_grad, case)
 
-        subtype=case[0][0]
-        final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
+        # final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
 
         # update weights
         # weights=learning_rate*final_grad+weights

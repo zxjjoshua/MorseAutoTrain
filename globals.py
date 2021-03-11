@@ -2,11 +2,16 @@ from typing import Dict, Optional
 # from processnode import ProcessNode as pn
 import processnode as pn
 import filenode as fn
+import record
 
 class GlobalVariable:
     fileNodeSet: Dict[int, fn.FileNode] = {}
     processNodeSet: Dict[int, pn.ProcessNode] = {}
     processNodePidMap: Dict[int, int] = {}
+    event_set: Dict[int, record.Record] = {}
+
+    # batch processing
+
 
     # # init value
     # stag_benign = 0.5
@@ -68,6 +73,17 @@ class GlobalVariable:
         if pid in cls.processNodePidMap:
             return cls.processNodePidMap[pid]
         return -1
+
+    # -------------- event map ------------------ #
+    @classmethod
+    def get_event_by_id(cls, id: int)-> record.Record:
+        if id in cls.event_set:
+            return cls.event_set[id]
+        return None
+
+    @classmethod
+    def set_event_by_id(cls, id: int, record: record.Record):
+        cls.event_set[id]=record
 
     # -------------- tag getters ------------------ #
     # ---  deprecated
