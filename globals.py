@@ -11,7 +11,7 @@ class GlobalVariable:
     event_set: Dict[int, record.Record] = {}
 
     # batch processing
-
+    node_list={}
 
     # # init value
     # stag_benign = 0.5
@@ -85,6 +85,18 @@ class GlobalVariable:
     def set_event_by_id(cls, id: int, record: record.Record):
         cls.event_set[id]=record
 
+    # -------------- node list ------------------ #
+    @classmethod
+    def get_node_list(cls):
+        return cls.node_list
+
+    @classmethod
+    def empty_node_list(cls):
+        cls.node_list=[]
+
+    @classmethod
+    def add_node_list(cls, node: object):
+        cls.node_list.append(node)
     # -------------- tag getters ------------------ #
     # ---  deprecated
 

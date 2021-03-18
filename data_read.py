@@ -1,28 +1,23 @@
-from typing import Dict, Any
-import numpy as np
 from record import Record
 from logging import getLogger
 import event.event_parser as ep
 import logging
-from processnode import ProcessNode
-from filenode.file_node import FileNode
 from globals import GlobalVariable as gv
 import train as tr
 import data_rearrange
+import train
 
 logger = getLogger("dataRead")
 # processNodeSet: Dict[int, ProcessNode]={}
 # fileNodeSet: Dict[int, FileNode]={}
 # global processNodeSet
 # global fileNodeSet
-processNodeSet = {}
-fileNodeSet = {}
 
 
 def dataRead(fileName):
     f = open(fileName, "r")
     i = 0
-    batch_size = 100
+    max_event_per_epoch = 1000
     event_num=0
     while True:
         line = f.readline()
@@ -37,7 +32,10 @@ def dataRead(fileName):
                 ep.EventParser.parse(record)
                 tr.back_propagate(record, 0.5)
                 data_rearrange.pre_process(record)
-                if event_num==batch_size:
+
+                # process batch-wise
+                if event_num==max_event_per_epoch:
+                    train.back_propagate_batch(0.05)
 
             elif record.type == -1:
                 # file node
@@ -111,16 +109,6 @@ def readObj(f):
     if params:
         event.params = params
     return event
-
-
-def remove_file_node(id: int):
-    if id in fileNodeSet:
-        fileNodeSet.pop(id)
-
-
-def remove_process_node(id: int):
-    if id in processNodeSet:
-        processNodeSet.pop(id)
 
 
 def pruningStr(line):

@@ -1,3 +1,4 @@
+import rnn_model.simple_network as simple_net
 
 
 class Target:
@@ -20,11 +21,18 @@ class Target:
     a_b = 0.1
     a_e = 0.05
 
+    benign_thresh_model = simple_net.SimpleNet()
+    suspect_env_model = simple_net.SimpleNet()
+
     # -------------- tag getters ------------------ #
 
     @classmethod
     def get_benign_thresh(cls) -> float:
         return cls.benign
+
+    @classmethod
+    def get_susp_thresh(cls) -> float:
+        return cls.suspect_env
 
     @classmethod
     def get_stag_benign(cls) -> float:
