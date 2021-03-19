@@ -17,7 +17,7 @@ logger = getLogger("dataRead")
 def dataRead(fileName):
     f = open(fileName, "r")
     i = 0
-    max_event_per_epoch = 1000
+    max_event_per_epoch = 100
     event_num=0
     while True:
         line = f.readline()
@@ -30,7 +30,7 @@ def dataRead(fileName):
                 # event type
                 event_num+=1
                 ep.EventParser.parse(record)
-                tr.back_propagate(record, 0.5)
+                # tr.back_propagate(record, 0.5)
                 data_rearrange.pre_process(record)
 
                 # process batch-wise

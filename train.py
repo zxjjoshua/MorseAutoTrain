@@ -3,6 +3,9 @@ import math
 import morse_train
 from processnode import ProcessNode
 from globals import GlobalVariable as gv
+import RNN
+from target import Target as tg
+
 
 def rand(a, b):
     return (b - a) * np.random.random() + a
@@ -111,19 +114,20 @@ def back_propagate_batch(learn):
     for node_id in process_node_list:
         node=process_node_list[node_id]
         sequence = node.generate_sequence()
-        # rnn_grad = RNN.forward(sequence)
+        # batch_size * sequence_size * feature _size
+        # batch_size: 100
+        # sequence_size: 5
+        # feature_size: 12
 
 
-        rnn_grad: np.array(4,3)
-        # rnn_grad = calculate_loss_grad(loss)
+        rnn_grad = RNN.train_model(sequence)
+        # ? * ?
 
-        Morse_loss: np.array
-        # Morse_grad = morse_train.back_propagate(RNN_grad, case)
-
-        # final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
+        final_grad = morse_train.back_propagate(rnn_grad)
+        # -> 4 x 4
 
         # update weights
-        # weights=learning_rate*final_grad+weights
+
 
     for node in file_node_list:
         node = file_node_list[node_id]
