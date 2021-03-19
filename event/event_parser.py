@@ -1,12 +1,7 @@
 from record import Record
-import numpy as np
-# from DataRead import processNodeSet, fileNodeSet
-import data_read
-from logging import getLogger
 from filenode import FileNode
 from processnode import ProcessNode
 from event.event_processor import *
-import logging
 from globals import GlobalVariable as gv
 from target import Target as tg
 
@@ -161,7 +156,7 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = record.params + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(), tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.getMatrixArray(4)
         desArray = destNode.get_matrix_array(4)
         return np.array([eventArray, params, srcArray, desArray])
@@ -191,7 +186,8 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = record.params + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
+                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.getMatrixArray(4)
         return np.array([eventArray, params, srcArray, desArray])
@@ -219,7 +215,8 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = record.params + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
+                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
         return np.array([eventArray, params, srcArray, desArray])
@@ -247,7 +244,8 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = record.params + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
+                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.getMatrixArray(4)
         desArray = destNode.getMatrixArray(4)
         return np.array([eventArray, params, srcArray, desArray])

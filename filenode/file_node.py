@@ -1,4 +1,4 @@
-
+import numpy as np
 
 class FileNode:
     def __init__(self, id: int, time: int, type: int, subtype: int):
@@ -11,6 +11,11 @@ class FileNode:
         self.iTag: float = 0.0
         self.cTag: float = 0.0
 
+        self.event_list = []
+        self.state_list = []
+        self.cur_state = np.zeros(2, 3)
+        self.seq_len = 0
+
 
     def getMatrixArray(self, padding: 4):
         if padding < 4:
@@ -18,4 +23,21 @@ class FileNode:
         # init tags
         return [self.subtype, 0.0, self.iTag, self.cTag] + [0] * (padding - 4)
 
+    def add_event(self, event_id: int):
+        self.event_list.append(event_id)
 
+    def get_event_list(self)->list:
+        return self.event_list
+
+    def state_update(self, state: np.array):
+        self.cur_state = state
+        self.state_list.append(state)
+        self.seq_len += 1
+
+    def generate_sequence(self, length:5):
+        if self.seq_len<length:
+            return []
+        res=[]
+        for i in range(len(self.state_list)-length):
+            res.append(self.state_list[i:i+length+1])
+        return res

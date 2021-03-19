@@ -1,5 +1,10 @@
 import numpy as np
 import math
+import morse_train
+from processnode import ProcessNode
+from globals import GlobalVariable as gv
+import RNN
+from target import Target as tg
 
 
 def rand(a, b):
@@ -18,6 +23,7 @@ def sigmoid(x):
 
 def sigmod_derivative(x):
     return x * (1 - x)
+
 
 class Train:
 
@@ -56,8 +62,6 @@ class Train:
                         self.input_correction = make_matrix(self.input_n, self.hidden_n)
                         self.output_correction = make_matrix(self.hidden_n, self.output_n)
 
-
-
     def forward(self, inputs):
         # activate input layer
         for i in range(self.input_n - 1):
@@ -76,41 +80,71 @@ class Train:
             self.output_cells[k] = sigmoid(total)
         return self.output_cells[:]
 
-    def back_propagate(self, case, label, learn, correct):
-        # feed forward, get the predicted result
-        res = self.forward(case)
+
+def back_propagate(case, learn):
+    # feed forward, get the predicted result
+    # res = self.forward(case)
+
+    # Morse_res = Morse.forward()
+    # generate sequence
+    # RNN_res=RNN.forward(Morse_res)
+
+    # loss = calculate_loss(RNN_res)
+    rnn_grad: np.array(4,3)
+    # rnn_grad = calculate_loss_grad(loss)
+
+    Morse_loss: np.array
+    # Morse_grad = morse_train.back_propagate(RNN_grad, case)
+
+    subtype=case[0][0]
+    final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
+
+    # update weights
+    # weights=learning_rate*final_grad+weights
 
 
+def back_propagate_batch(learn):
+    node_list: list[ProcessNode]
+    process_node_list = gv.processNodeSet
+    file_node_list = gv.fileNodeSet
+    # feed forward, get the predicted result
+    # res = self.forward(case)
+
+    # generate sequence
+    for node_id in process_node_list:
+        node=process_node_list[node_id]
+        sequence = node.generate_sequence()
+        # batch_size * sequence_size * feature _size
+        # batch_size: 100
+        # sequence_size: 5
+        # feature_size: 12
 
 
-        # get output layer error
-        output_deltas = [0.0] * self.output_n
-        for o in range(self.output_n):
-            error = label[o] - self.output_cells[o]
-            output_deltas[o] = sigmod_derivative(self.output_cells[o]) * error
+        rnn_grad = RNN.train_model(sequence)
+        # ? * ?
 
-        # get hidden layer error
-        hidden_deltas = [0.0] * self.hidden_n
-        for h in range(self.hidden_n):
-            error = 0.0
-            for o in range(self.output_n):
-                error += output_deltas[o] * self.output_weights[h][o]
-            hidden_deltas[h] = sigmod_derivative(self.hidden_cells[h]) * error
-        # update output weights
-        for h in range(self.hidden_n):
-            for o in range(self.output_n):
-                change = output_deltas[o] * self.hidden_cells[h]
-                self.output_weights[h][o] += learn * change + correct * self.output_correction[h][o]
-                self.output_correction[h][o] = change
-        # update input weights
-        for i in range(self.input_n):
-            for h in range(self.hidden_n):
-                change = hidden_deltas[h] * self.input_cells[i]
-                self.input_weights[i][h] += learn * change + correct * self.input_correction[i][h]
-                self.input_correction[i][h] = change
-        # get global error
-        error = 0.0
-        for o in range(len(label)):
-            error += 0.5 * (label[o] - self.output_cells[o]) ** 2
-        return error
+        final_grad = morse_train.back_propagate(rnn_grad)
+        # -> 4 x 4
+
+        # update weights
+
+
+    for node in file_node_list:
+        node = file_node_list[node_id]
+        sequence = node.generate_sequence()
+
+        # RNN_res = RNN.forward(sequence)
+
+
+        # loss = calculate_loss(RNN_res)
+        rnn_grad: np.array(1,12)
+        # rnn_grad = calculate_loss_grad(loss)
+
+        Morse_loss: np.array
+        # Morse_grad = morse_train.back_propagate(RNN_grad, case)
+
+        # final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
+
+        # update weights
+        # weights=learning_rate*final_grad+weights
 
