@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 from tqdm import tqdm
 %matplotlib inline
+import numpy as np
 
 is_cuda = torch.cuda.is_available()
 
@@ -66,6 +67,7 @@ model = RNNet(input_dim, hidden_dim, output_dim, numOfRNNLayers)
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=Learning_Rate)
     
+
 def train_model(train_loader):
     model.train()
     epoch_list = []
