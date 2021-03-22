@@ -66,29 +66,29 @@ model = RNNet(input_dim, hidden_dim, output_dim, numOfRNNLayers)
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=Learning_Rate)
     
-def train_model():
+def train_model(train_loader):
     model.train()
     epoch_list = []
     loss_list = []
     error_list = []
-    counter = 1
-    for epoch in tqdm(range(1, numOfEpoch + 1)):
-        avg_loss = 0
-        for x in train_loader:
-            model.zero_grad()
-            x.float().to(device)
-            out, h = model(x.float())
-            loss = Loss_Function(out)
-            loss.backward()
-            ## pass gradient
-            x.grad()
-            optimizer.step()
-            avg_loss += loss.item()
-        epoch_list.append(counter)
-        loss_list.append(avg_loss / len(train_loader))
-        error_list.append(evaluate_model())
-        counter += 1
-    return epoch_list, loss_list, error_list
+    # counter = 1
+    # avg_loss = 0
+    for x in train_loader:
+        model.zero_grad()
+        x.float().to(device)
+        out, h = model(x.float())
+        loss = Loss_Function(out)
+        loss.backward()
+        ## TODO: pass gradient
+        x.grad()
+        optimizer.step()
+        # avg_loss += loss.item()
+    # epoch_list.append(counter)
+    # loss_list.append(avg_loss / len(train_loader))
+    # error_list.append(evaluate_model())
+    # counter += 1
+    # return epoch_list, loss_list, error_list
+    return
 
 def evaluate_model():
     # use current model to make prediction
