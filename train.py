@@ -119,15 +119,17 @@ def back_propagate_batch(learn):
         # sequence_size: 5
         # feature_size: 12
 
-
+        # 100*5*12
+        # 1*3
         rnn_grad = RNN.train_model(sequence)
+        # 100*5*12 * 12*64* 64*64 *  * *3
         # ? * ?
 
         final_grad = morse_train.back_propagate(rnn_grad)
         # -> 4 x 4
 
         # update weights
-
+        # weights=learning_rate*final_grad+weights
 
     for node in file_node_list:
         node = file_node_list[node_id]

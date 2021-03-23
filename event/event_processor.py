@@ -27,33 +27,29 @@ class EventProcessor:
         res_tags = jnp.append(tags, final_tags)
         return res_tags
 
-
     @staticmethod
     def write_process(
             vector: jnp.array
     ):
-        benign = vector[1][2]
-        suspect_env = vector[1][3]
+        benign_thresh = vector[1][2]
+        susp_thresh = vector[1][3]
         a_b = vector[1][0]
         a_e = vector[1][1]
-
 
         vector.astype(np.float)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
 
-        benign_thresh = tg.benign_thresh_model(tags[0][0])
-        susp_thresh = tg.suspect_env_model(tags[0][0])
-
         benign_mul = benign_thresh+susp_thresh
         susp_mul = (1-benign_thresh) + susp_thresh
         dangerous_mul = (1-benign_thresh) + (1- susp_thresh)
 
-        attenuation = jnp.array([[0, a_b, a_b], [0, 0, 0]])
+        attenuation_b = jnp.array([[0, a_b, a_b], [0, 0, 0]])
+        attenuation_e = jnp.array([[0, a_e, a_e], [0, 0, 0]])
 
-        tag_benign = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation, axis=0)[1:3])).reshape(1,length)
-        tag_susp_env = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation, axis=0)[1:3])).reshape(1,length)
+        tag_benign = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation_b, axis=0)[1:3])).reshape(1,length)
+        tag_susp_env = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation_e, axis=0)[1:3])).reshape(1,length)
         tag_dangerous = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags[:, 1:3], axis=0))).reshape(1,length)
 
         possible_tags = jnp.concatenate([tag_benign, tag_susp_env, tag_dangerous])
@@ -90,7 +86,6 @@ class EventProcessor:
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
         final_tags = tags
         final_tags[0][1:3] = tags[1][:, 1:3]
-
 
         res_tags = jnp.concatenate(tags.reshape(1, length), final_tags)
 
@@ -154,15 +149,12 @@ class EventProcessor:
     def exec_process(
             vector: jnp.array
     ):
-        benign = vector[1][2]
-        suspect_env = vector[1][3]
+        benign_thresh = vector[1][2]
+        susp_thresh = vector[1][3]
         a_b = vector[1][0]
         a_e = vector[1][1]
 
         tags = vector[2:, 1:].astype(np.float)
-
-        benign_thresh = tg.benign_thresh_model(tags[0][0])
-        susp_thresh = tg.suspect_env_model(tags[0][0])
 
         benign_mul = benign_thresh + susp_thresh
         susp_mul = (1 - benign_thresh) + susp_thresh
@@ -173,7 +165,7 @@ class EventProcessor:
                                      1.0 - tags[0, 2]],
                                     [0, 0, 0]])
 
-        tag_susp_env = tags + jnp.array([[jnp.minimum(suspect_env, tags[1, 1]) - tags[0, 0],
+        tag_susp_env = tags + jnp.array([[jnp.minimum(tg.get_susp_thresh(), tags[1, 1]) - tags[0, 0],
                                      jnp.minimum(tags[0, 1], tags[1, 1]) - tags[0, 1],
                                      jnp.minimum(tags[0, 2], tags[1, 2]) - tags[0, 2]],
                                     [0, 0, 0]])
