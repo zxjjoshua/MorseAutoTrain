@@ -67,29 +67,27 @@ model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=Learning_Rate)
     
 
-def train_model(train_loader):
+def train_model(x):
     model.train()
     epoch_list = []
     loss_list = []
     error_list = []
     # counter = 1
     # avg_loss = 0
-    for x in train_loader:
-        model.zero_grad()
-        x.float().to(device)
-        out, h = model(x.float())
-        loss = Loss_Function(out)
-        loss.backward()
-        ## TODO: pass gradient
-        x.grad()
-        optimizer.step()
+    model.zero_grad()
+    x.float().to(device)
+    out, h = model(x.float())
+    loss = Loss_Function(out)
+    loss.backward()
+    rnn_grad = x.grad()
+    optimizer.step()
         # avg_loss += loss.item()
     # epoch_list.append(counter)
     # loss_list.append(avg_loss / len(train_loader))
     # error_list.append(evaluate_model())
     # counter += 1
     # return epoch_list, loss_list, error_list
-    return
+    return rnn_grad
 
 def evaluate_model():
     # use current model to make prediction
