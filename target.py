@@ -21,7 +21,9 @@ class Target:
     a_b = 0.1
     a_e = 0.05
 
+    # scaler w and b 
     benign_thresh_model = simple_net.SimpleNet()
+    # scaler w and b
     suspect_env_model = simple_net.SimpleNet()
 
     # -------------- tag getters ------------------ #
@@ -132,3 +134,21 @@ class Target:
     @classmethod
     def susp_thresh_backward(cls, grad: float):
         cls.benign_thresh_model.backward(grad)
+
+    # ------------------ weights setters ----------- # 
+
+    @classmethod
+    def a_b_setter(cls, final_a_b_grad):
+        cls.a_b = cls.a_b + final_a_b_grad
+    
+    @classmethod
+    def a_e_setter(cls, final_a_e_grad):
+        cls.a_e = cls.a_e + final_a_e_grad
+
+    @classmethod
+    def benign_thresh_model_setter(cls, final_w_grad, final_b_grad):
+        cls.benign_thresh_model.backward(final_w_grad=final_w_grad, final_b_grad=final_b_grad)
+
+    @classmethod
+    def suspect_env_model_setter(cls, final_w_grad, final_b_grad):
+        cls.benign_thresh_model.backward(final_w_grad=final_w_grad, final_b_grad=final_b_grad)

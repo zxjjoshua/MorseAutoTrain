@@ -97,10 +97,14 @@ def back_propagate(case, learn):
     # Morse_grad = morse_train.back_propagate(RNN_grad, case)
 
     subtype=case[0][0]
+    # 1 * 4
     final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
 
     # update weights
-    # weights=learning_rate*final_grad+weights
+    tg.a_b_setter(-learn*final_grad[0])
+    tg.a_e_setter(-learn*final_grad[1])
+    tg.benign_thresh_model_setter(-learn*final_grad[2], -learn*final_grad[3])
+    tg.suspect_env_model_setter(-learn*final_grad[4], -learn*final_grad[5])
 
 
 def back_propagate_batch(learn):
