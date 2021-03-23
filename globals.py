@@ -12,6 +12,9 @@ class GlobalVariable:
 
     # batch processing
     node_list={}
+    batch_size = 100
+    sequence_size = 5
+    feature_size = 12
 
     # # init value
     # stag_benign = 0.5

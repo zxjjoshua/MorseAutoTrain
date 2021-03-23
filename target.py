@@ -115,3 +115,20 @@ class Target:
     @classmethod
     def set_itag_dangerous(cls, val):
         cls.itag_dangerous = val
+
+    # ------------------ model getters-------------- #
+    @classmethod
+    def get_benign_possibility(cls, stag: float):
+        return cls.benign_thresh_model(stag)
+
+    @classmethod
+    def get_susp_possibility(cls, stag: float):
+        return cls.suspect_env_model(stag)
+
+    @classmethod
+    def benign_thresh_backward(cls, grad: float):
+        cls.benign_thresh_model.backward(grad)
+
+    @classmethod
+    def susp_thresh_backward(cls, grad: float):
+        cls.benign_thresh_model.backward(grad)
