@@ -3,7 +3,7 @@ import numpy as np
 import event.event_processor as ep
 
 
-def back_propagate(event_type: int, vector: np.array, loss: np.array, rnn_grad: np.array):
+def back_propagate(event_type: int, vector: np.array, rnn_grad: np.array):
     if event_type == 1:
         pass
     elif event_type == 4:
@@ -18,6 +18,7 @@ def back_propagate(event_type: int, vector: np.array, loss: np.array, rnn_grad: 
     elif event_type == 8:
         morse_grad: np.array
         morse_grad = ep.get_write_grad(vector)
+        # 1*12 * 4*4
         final_grad = get_grad_from_morse_and_rnn(morse_grad, rnn_grad)
         return final_grad
     else:

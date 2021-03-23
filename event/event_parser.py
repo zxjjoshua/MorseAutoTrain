@@ -156,9 +156,11 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(), tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.get_matrix_array(4)
+        desArray = destNode.getMatrixArray(4)
+
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
+                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -186,10 +188,11 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
-                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
-        srcArray = srcNode.get_matrix_array(4)
+        srcArray = srcNode.getMatrixArray(4)
         desArray = destNode.getMatrixArray(4)
+
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
+                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -215,10 +218,11 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
-                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
-        srcArray = srcNode.get_matrix_array(4)
-        desArray = destNode.get_matrix_array(4)
+        srcArray = srcNode.getMatrixArray(4)
+        desArray = destNode.getMatrixArray(4)
+
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
+                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -244,8 +248,9 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_thresh(),
-                  tg.get_susp_thresh()] + [0] * (4 - len(record.params))
         srcArray = srcNode.getMatrixArray(4)
         desArray = destNode.getMatrixArray(4)
+
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
+                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         return np.array([eventArray, params, srcArray, desArray])

@@ -5,7 +5,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import math
 from tqdm import tqdm
-%matplotlib inline
 import numpy as np
 
 is_cuda = torch.cuda.is_available()
