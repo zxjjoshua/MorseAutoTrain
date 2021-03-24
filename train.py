@@ -115,9 +115,20 @@ def back_propagate_batch(learn):
     # res = self.forward(case)
 
     # generate sequence
+    cur_len=0
+    cur_batch=[]
+    remain_batch=[]
     for node_id in process_node_list:
         node=process_node_list[node_id]
-        sequence = node.generate_sequence()
+        sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+        if len(sequence)+cur_len>gv.batch_size:
+            need=gv.batch_size-cur_len
+            cur_batch+=sequence[:need]
+            cur_len=gv.batch_size
+            remain_batch=sequence[need:]
+        else:
+            cur_batch+=sequence
+            cur_len+=len(sequence)
         # batch_size * sequence_size * feature _size
         # batch_size: 100
         # sequence_size: 5
@@ -125,32 +136,56 @@ def back_propagate_batch(learn):
 
         # 100*5*12
         # 1*3
-        rnn_grad = RNN.train_model(sequence)
-        # 100*5*12 * 12*64* 64*64 *  * *3
-        # ? * ?
+        if cur_len>=gv.batch_size:
+            rnn_grad = RNN.train_model(sequence)
+            # 100*5*12 * 12*64* 64*64 *  * *3
+            # ? * ?
 
-        final_grad = morse_train.back_propagate(rnn_grad)
-        # -> 4 x 4
+            final_grad = morse_train.back_propagate(sequence, node.get_event_type_list(), node.get_event_list(), rnn_grad)
 
-        # update weights
-        # weights=learning_rate*final_grad+weights
+            # update weights
+            tg.a_b_setter(-learn * final_grad[0])
+            tg.a_e_setter(-learn * final_grad[1])
+            tg.benign_thresh_model_setter(final_grad[2])
+            tg.suspect_env_model_setter(final_grad[3])
+            cur_batch=remain_batch[::]
+            remain_batch=[]
 
-    for node in file_node_list:
-        node = file_node_list[node_id]
+    cur_len = 0
+    cur_batch = []
+    remain_batch = []
+    for node_id in file_node_list:
+        node = process_node_list[node_id]
         sequence = node.generate_sequence()
+        if len(sequence) + cur_len > gv.batch_size:
+            need = gv.batch_size - cur_len
+            cur_batch += sequence[:need]
+            cur_len = gv.batch_size
+            remain_batch = sequence[need:]
+        else:
+            cur_batch += sequence
+            cur_len += len(sequence)
+        # batch_size * sequence_size * feature _size
+        # batch_size: 100
+        # sequence_size: 5
+        # feature_size: 12
 
-        # RNN_res = RNN.forward(sequence)
+        # 100*5*12
+        # 1*3
+        if cur_len >= gv.batch_size:
+            rnn_grad = RNN.train_model(sequence)
+            # 100*5*12 * 12*64* 64*64 *  * *3
+            # ? * ?
 
+            final_grad = morse_train.back_propagate(sequence, node.get_event_type_list(), node.get_event_list(),
+                                                    rnn_grad)
 
-        # loss = calculate_loss(RNN_res)
-        rnn_grad: np.array(1,12)
-        # rnn_grad = calculate_loss_grad(loss)
+            # update weights
+            tg.a_b_setter(-learn * final_grad[0])
+            tg.a_e_setter(-learn * final_grad[1])
+            tg.benign_thresh_model_setter(final_grad[2])
+            tg.suspect_env_model_setter(final_grad[3])
+            cur_batch = remain_batch[::]
+            remain_batch = []
 
-        Morse_loss: np.array
-        # Morse_grad = morse_train.back_propagate(RNN_grad, case)
-
-        # final_grad=morse_train.back_propagate(subtype, case, rnn_grad)
-
-        # update weights
-        # weights=learning_rate*final_grad+weights
 

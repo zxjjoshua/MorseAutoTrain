@@ -146,9 +146,9 @@ class Target:
         cls.a_e = cls.a_e + final_a_e_grad
 
     @classmethod
-    def benign_thresh_model_setter(cls, final_w_grad, final_b_grad):
-        cls.benign_thresh_model.backward(final_w_grad=final_w_grad, final_b_grad=final_b_grad)
+    def benign_thresh_model_setter(cls, grad):
+        cls.benign_thresh_model.backward(grad)
 
     @classmethod
-    def suspect_env_model_setter(cls, final_w_grad, final_b_grad):
-        cls.benign_thresh_model.backward(final_w_grad=final_w_grad, final_b_grad=final_b_grad)
+    def suspect_env_model_setter(cls, grad):
+        cls.benign_thresh_model.backward(grad)

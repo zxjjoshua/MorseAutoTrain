@@ -4,6 +4,7 @@ from processnode import ProcessNode
 from event.event_processor import *
 from globals import GlobalVariable as gv
 from target import Target as tg
+import torch
 
 logger = getLogger("EventParser")
 
@@ -11,7 +12,16 @@ logger = getLogger("EventParser")
 class EventParser:
     @staticmethod
     def parse(record: Record):
-        vector: np.array
+        vector= np.zeros([4,4])
+        morse_res = np.zeros([1,12])
+
+        src_id = record.srcId
+        des_id = record.desId
+        event_id=record.Id
+        subtype = record.subtype
+        src_node = None
+        des_node = None
+
         if record.subtype == 1:
             pass
         elif record.subtype == 2:
@@ -22,49 +32,65 @@ class EventParser:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.read_process(vector)
+            morse_res = EventProcessor.read_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 5:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.read_process(vector)
+            morse_res = EventProcessor.read_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 6:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.read_process(vector)
+            morse_res = EventProcessor.read_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 7:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.read_process(vector)
+            morse_res = EventProcessor.read_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 8:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
+            morse_res = EventProcessor.write_process(vector)
+            src_node = gv.get_fileNode(src_id)
+            des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 9:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
+            morse_res = EventProcessor.write_process(vector)
+            src_node = gv.get_fileNode(src_id)
+            des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 10:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
+            morse_res = EventProcessor.write_process(vector)
+            src_node = gv.get_fileNode(src_id)
+            des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 11:
             vector = EventParser.file2process_parser(record)
             if vector is None:
                 return
-            EventProcessor.write_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env(), tg.get_attenuate_benign(), tg.get_attenuate_susp_env())
+            morse_res = EventProcessor.write_process(vector)
+            src_node = gv.get_fileNode(src_id)
+            des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 12:
             pass
@@ -72,9 +98,12 @@ class EventParser:
             pass
         elif record.subtype == 14:
             vector = EventParser.process2process_parser(record)
+            print("this is vector ",vector)
             if vector is None:
                 return
-            EventProcessor.exec_process(vector, tg.get_itag_benign(), tg.get_itag_susp_env())
+            morse_res = EventProcessor.exec_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 15:
             pass
@@ -104,7 +133,9 @@ class EventParser:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.read_process(vector)
+            morse_res = EventProcessor.read_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 28:
             pass
@@ -124,12 +155,20 @@ class EventParser:
             vector = EventParser.process2file_parser(record)
             if vector is None:
                 return
-            EventProcessor.load_process(vector)
+            morse_res = EventProcessor.load_process(vector)
+            src_node = gv.get_processNode(src_id)
+            des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 36:
             pass
         elif record.subtype == 37:
             pass
+
+        if src_node and des_node:
+            src_node.state_update(morse_res,subtype, vector)
+            des_node.state_update(morse_res,subtype, vector)
+        gv.set_event_by_id(event_id, morse_res)
+        return morse_res
 
     @staticmethod
     def file2process_parser(record: Record) -> np.array:
@@ -156,8 +195,9 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
+        srcArray = srcNode.get_matrix_array(4)
+        desArray = destNode.get_matrix_array(4)
+
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
@@ -188,8 +228,8 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
+        srcArray = srcNode.get_matrix_array(4)
+        desArray = destNode.get_matrix_array(4)
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
@@ -218,11 +258,10 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
-
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
-                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
+        srcArray = srcNode.get_matrix_array(4)
+        desArray = destNode.get_matrix_array(4)
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).item(),
+                  tg.get_susp_possibility(srcArray[1]).item()]
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -248,8 +287,8 @@ class EventParser:
             return None
 
         eventArray = [id, time, subtype, 0]
-        srcArray = srcNode.getMatrixArray(4)
-        desArray = destNode.getMatrixArray(4)
+        srcArray = srcNode.get_matrix_array(4)
+        desArray = destNode.get_matrix_array(4)
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))

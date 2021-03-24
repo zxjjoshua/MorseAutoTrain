@@ -12,26 +12,33 @@ class FileNode:
         self.cTag: float = 0.0
 
         self.event_list = []
+        self.event_type_list = []
         self.state_list = []
-        self.cur_state = np.zeros(2, 3)
+        self.cur_state = np.zeros([2, 3])
         self.seq_len = 0
 
 
-    def getMatrixArray(self, padding: 4):
+    def get_matrix_array(self, padding: 4):
         if padding < 4:
             return None
-        # init tags
+
         return [self.subtype, 0.0, self.iTag, self.cTag] + [0] * (padding - 4)
 
-    def add_event(self, event_id: int):
+    def add_event(self, event_id: int, event_type: int):
         self.event_list.append(event_id)
+        self.event_type_list.append(event_type)
 
     def get_event_list(self)->list:
         return self.event_list
 
-    def state_update(self, state: np.array):
+    def get_event_type_list(self) -> list:
+        return self.event_type_list
+
+    def state_update(self,state: np.array, event_type: int, event: np.array):
         self.cur_state = state
         self.state_list.append(state)
+        self.event_list.append(event)
+        self.event_type_list.append(event_type)
         self.seq_len += 1
 
     def generate_sequence(self, length:5):

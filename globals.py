@@ -3,12 +3,13 @@ from typing import Dict, Optional
 import processnode as pn
 import filenode as fn
 import record
+import numpy as np
 
 class GlobalVariable:
     fileNodeSet: Dict[int, fn.FileNode] = {}
     processNodeSet: Dict[int, pn.ProcessNode] = {}
     processNodePidMap: Dict[int, int] = {}
-    event_set: Dict[int, record.Record] = {}
+    event_set: Dict[int, np.array] = {}
 
     # batch processing
     node_list={}
@@ -79,14 +80,14 @@ class GlobalVariable:
 
     # -------------- event map ------------------ #
     @classmethod
-    def get_event_by_id(cls, id: int)-> record.Record:
+    def get_event_by_id(cls, id: int)-> np.array:
         if id in cls.event_set:
             return cls.event_set[id]
         return None
 
     @classmethod
-    def set_event_by_id(cls, id: int, record: record.Record):
-        cls.event_set[id]=record
+    def set_event_by_id(cls, id: int, morese_result: np.array):
+        cls.event_set[id]=morese_result
 
     # -------------- node list ------------------ #
     @classmethod

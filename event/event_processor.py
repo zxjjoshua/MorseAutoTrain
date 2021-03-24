@@ -154,6 +154,7 @@ class EventProcessor:
         a_b = vector[1][0]
         a_e = vector[1][1]
 
+        print(vector.shape)
         tags = vector[2:, 1:].astype(np.float)
 
         benign_mul = benign_thresh + susp_thresh
@@ -208,24 +209,37 @@ class EventProcessor:
 
 
 def get_read_grad(vector: jnp.array):
-    return jacrev(EventProcessor.read_process)(vector)
+    grad = jacrev(EventProcessor.write_process)(vector)
+    # [12 * 4 * 4]
+    return grad[:, 1, :]
+    # [12 * 4]
 
 
 def get_write_grad(vector: jnp.array
                    ):
-    return jacrev(EventProcessor.write_process)(vector)
-    # jacobian matrix
-    # write_process -> 4x3 matrix [previous tags, updated tags]
+    grad = jacrev(EventProcessor.write_process)(vector)
+    # [12 * 4 * 4]
+    return grad[:,1,:]
+    # [12 * 4]
 
 
 def get_create_grad(vector: jnp.array):
-    return jacrev(EventProcessor.create_process)(vector)
+    grad = jacrev(EventProcessor.write_process)(vector)
+    # [12 * 4 * 4]
+    return grad[:, 1, :]
+    # [12 * 4]
 
 
 def get_load_grad(vector: jnp.array):
-    return jacrev(EventProcessor.load_process)(vector)
+    grad = jacrev(EventProcessor.write_process)(vector)
+    # [12 * 4 * 4]
+    return grad[:, 1, :]
+    # [12 * 4]
 
 
 def get_exec_grad(vector: jnp.array):
-    return jacrev(EventProcessor.exec_process)(vector)
+    grad = jacrev(EventProcessor.write_process)(vector)
+    # [12 * 4 * 4]
+    return grad[:, 1, :]
+    # [12 * 4]
 

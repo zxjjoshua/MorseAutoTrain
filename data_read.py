@@ -8,6 +8,8 @@ import data_rearrange
 import train
 
 logger = getLogger("dataRead")
+
+
 # processNodeSet: Dict[int, ProcessNode]={}
 # fileNodeSet: Dict[int, FileNode]={}
 # global processNodeSet
@@ -18,7 +20,7 @@ def dataRead(fileName):
     f = open(fileName, "r")
     i = 0
     max_event_per_epoch = 100
-    event_num=0
+    event_num = 0
     while True:
         line = f.readline()
         if not line:
@@ -28,14 +30,15 @@ def dataRead(fileName):
             record = readObj(f)
             if record.type == 1:
                 # event type
-                event_num+=1
+                event_num += 1
                 ep.EventParser.parse(record)
                 # tr.back_propagate(record, 0.5)
-                data_rearrange.pre_process(record)
+                # data_rearrange.pre_process(record)
 
                 # process batch-wise
-                if event_num==max_event_per_epoch:
+                if event_num == max_event_per_epoch:
                     train.back_propagate_batch(0.05)
+                    event_num = 0
 
             elif record.type == -1:
                 # file node
@@ -67,6 +70,7 @@ def dataRead(fileName):
                         gv.set_processNode(newNode.id, newNode)
         i += 1
     data_rearrange.post_train()
+
 
 def readObj(f):
     event = Record()
