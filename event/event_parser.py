@@ -98,7 +98,7 @@ class EventParser:
             pass
         elif record.subtype == 14:
             vector = EventParser.process2process_parser(record)
-            print("this is vector ",vector)
+            # print("this is vector ",vector)
             if vector is None:
                 return
             morse_res = EventProcessor.exec_process(vector)
@@ -199,8 +199,9 @@ class EventParser:
         desArray = destNode.get_matrix_array(4)
 
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
-                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
+                  tg.get_susp_possibility(srcArray[1]).detach().numpy()]
+        # print("params: ", params[2].detach().numpy())
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -231,8 +232,8 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
-                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
+                  tg.get_susp_possibility(srcArray[1]).detach().numpy()]
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod

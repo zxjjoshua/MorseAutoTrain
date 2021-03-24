@@ -17,6 +17,7 @@ class EventProcessor:
         # tags structure
         # srcNode: sTag iTag cTag
         # desNode: sTag iTag cTag
+        # print(vector)
         vector.astype(np.float)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -36,9 +37,15 @@ class EventProcessor:
         a_b = vector[1][0]
         a_e = vector[1][1]
 
-        vector.astype(np.float)
+        # print(vector)
+        vector.astype(float)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        # print("left_matrix: ", left_matrix.shape)
+        # print("vector: ", vector.shape)
+        # print("right_matrix: ", right_matrix.shape)
+        # print(vector)
+        # some values in the vector are torch tensor but not a number, so they are replaced by their data, losing the autograd trace
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
 
         benign_mul = benign_thresh+susp_thresh
@@ -154,7 +161,7 @@ class EventProcessor:
         a_b = vector[1][0]
         a_e = vector[1][1]
 
-        print(vector.shape)
+        # print(vector.shape)
         tags = vector[2:, 1:].astype(np.float)
 
         benign_mul = benign_thresh + susp_thresh
@@ -181,8 +188,11 @@ class EventProcessor:
 
         possible_tags = jnp.stack([tag_benign, tag_susp_env, tag_dangerous])
         tags_probability = jax.nn.softmax(jnp.array([benign_mul, susp_mul, dangerous_mul]))
-
-        final_tags = jnp.dot(tags_probability, possible_tags)
+        
+        # print(tags_probability.shape)
+        # print(possible_tags.shape)
+        final_tags = jnp.tensordot(tags_probability, possible_tags, axes=([0], [0]))
+        # final_tags = jnp.dot(tags_probability, possible_tags)
 
         # if tags[0, 0] >= benign:
         #     res = tags + jnp.array([[tags[1, 1] - tags[0, 0],

@@ -73,7 +73,7 @@ class ProcessNode:
         self.event_type_list.append(event_type)
         self.seq_len += 1
 
-    def generate_sequence(self, batch_size: 100, sequence_size: 5):
+    def generate_sequence(self, batch_size=100, sequence_size=5):
         """
         :param batch_size: how many sequences in a batch
         :param sequence_size: how long a sequence is

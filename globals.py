@@ -9,7 +9,7 @@ class GlobalVariable:
     fileNodeSet: Dict[int, fn.FileNode] = {}
     processNodeSet: Dict[int, pn.ProcessNode] = {}
     processNodePidMap: Dict[int, int] = {}
-    event_set: Dict[int, np.array] = {}
+    event_set: Dict[int, np.ndarray] = {}
 
     # batch processing
     node_list={}
@@ -80,13 +80,14 @@ class GlobalVariable:
 
     # -------------- event map ------------------ #
     @classmethod
-    def get_event_by_id(cls, id: int)-> np.array:
+    def get_event_by_id(cls, id: int)-> np.ndarray:
+        # print(id)
         if id in cls.event_set:
             return cls.event_set[id]
         return None
 
     @classmethod
-    def set_event_by_id(cls, id: int, morese_result: np.array):
+    def set_event_by_id(cls, id: int, morese_result: np.ndarray):
         cls.event_set[id]=morese_result
 
     # -------------- node list ------------------ #

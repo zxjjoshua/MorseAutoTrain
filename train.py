@@ -154,7 +154,14 @@ def back_propagate_batch(learn):
     cur_len = 0
     cur_batch = []
     remain_batch = []
-    for node_id in file_node_list:
+
+    # tmp = 0
+    # for node_id in file_node_list:
+    #     if node_id not in process_node_list.keys():
+    #         tmp += 1
+    # print("not in: ", tmp)
+
+    for node_id in process_node_list:
         node = process_node_list[node_id]
         sequence = node.generate_sequence()
         if len(sequence) + cur_len > gv.batch_size:

@@ -31,6 +31,7 @@ def post_train():
         node = gv.get_processNode(node_id)
         if node:
             event_list = node.get_event_list()
+            # print(len(event_list))
             for event_id in event_list:
                 event = gv.get_event_by_id(event_id)
                 ep.EventParser.parse(event)
