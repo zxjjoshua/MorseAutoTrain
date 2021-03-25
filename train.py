@@ -161,8 +161,8 @@ def back_propagate_batch(learn):
     #         tmp += 1
     # print("not in: ", tmp)
 
-    for node_id in process_node_list:
-        node = process_node_list[node_id]
+    for node_id in file_node_list:
+        node = file_node_list[node_id]
         sequence = node.generate_sequence()
         if len(sequence) + cur_len > gv.batch_size:
             need = gv.batch_size - cur_len

@@ -47,7 +47,7 @@ class RNNet(torch.nn.Module):
         super(RNNet, self).__init__()
         self.hidden_dim = hidden_dim
         self.numOfRNNLayers = numOfRNNLayers
-        self.rnn_layer = torch.nn.RNN(input_dim, hidden_dim, numOfRNNLayers, batch_first=True, dropout=dropout_threshold)
+        self.rnn_layer = torch.nn.RNN(input_dim, hidden_dim, numOfRNNLayers, batch_first=True)
         self.fc = torch.nn.Linear(hidden_dim, output_dim)
     
     def forward(self, x):
