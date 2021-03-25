@@ -69,7 +69,7 @@ def dataRead(fileName):
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i += 1
-    data_rearrange.post_train()
+    # data_rearrange.post_train()
 
 
 def readObj(f):

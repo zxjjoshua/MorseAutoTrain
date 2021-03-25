@@ -14,7 +14,6 @@ class EventParser:
     def parse(record: Record):
         vector= np.zeros([4,4])
         morse_res = np.zeros([1,12])
-
         src_id = record.srcId
         des_id = record.desId
         event_id=record.Id
@@ -165,9 +164,12 @@ class EventParser:
             pass
 
         if src_node and des_node:
-            src_node.state_update(morse_res,subtype, vector)
-            des_node.state_update(morse_res,subtype, vector)
+            # print(vector)
+            src_node.state_update(morse_res,subtype, vector, event_id)
+            des_node.state_update(morse_res,subtype, vector, event_id)
+        # print(event_id)
         gv.set_event_by_id(event_id, morse_res)
+        # print(type(morse_res))
         return morse_res
 
     @staticmethod

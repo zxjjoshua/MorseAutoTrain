@@ -30,11 +30,16 @@ def post_train():
     for node_id in gv.processNodeSet:
         node = gv.get_processNode(node_id)
         if node:
-            event_list = node.get_event_list()
-            # print(len(event_list))
-            for event_id in event_list:
+            # event_list = node.get_event_list()
+            event_list_id = node.get_event_id_list()
+            # print(event_list)
+            for event_id in event_list_id:
+
                 event = gv.get_event_by_id(event_id)
-                ep.EventParser.parse(event)
+                # print(event)
+                if isinstance(event, rec.Record):
+                    ep.EventParser.parse(event)
+                
         state_sequence = node.generate_sequence(5)
         # do rnn process
         # calculate loss

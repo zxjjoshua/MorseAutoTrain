@@ -18,6 +18,7 @@ class ProcessNode:
         self.processName = processName
 
         self.event_list = []
+        self.event_id_list = []
         self.event_type_list = []
         self.state_list = []
         self.cur_state = np.zeros([2,3])
@@ -57,19 +58,26 @@ class ProcessNode:
         return [self.subtype, self.sTag, self.iTag, self.cTag] + [0] * (padding - 4)
 
     def add_event(self, event_id: int, event_type: int):
+        # print(event_id)
         self.event_list.append(event_id)
         self.event_type_list.append(event_type)
 
     def get_event_list(self) -> list:
         return self.event_list
+    
+    def get_event_id_list(self) -> list:
+        return self.event_id_list
 
     def get_event_type_list(self) -> list:
         return self.event_type_list
 
-    def state_update(self,state: np.array, event_type: int, event: np.array):
+    def state_update(self,state: np.array, event_type: int, event: np.array, event_id: int=None):
+        # print(event)
         self.cur_state = state
         self.state_list.append(state)
         self.event_list.append(event)
+        if event_id is not None:
+            self.event_id_list.append(event_id)
         self.event_type_list.append(event_type)
         self.seq_len += 1
 
