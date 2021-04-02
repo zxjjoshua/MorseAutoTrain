@@ -12,12 +12,16 @@ class SimpleNet(nn.Module):
 
     def forward(self, x):
         self.y = (torch.tanh(self.w*x+self.b))
+        print("this is output ", self.y)
         return self.y
 
     def backward(self, grad=torch.tensor(1.0)):
         if not isinstance(grad, torch.Tensor):
             grad=torch.tensor(grad)
-        self.y.backward(grad)
+        self.w.retain_grad()
+        self.b.retain_grad()
+        # self.y.backward(grad, retain_graph = True)
+        self.y.backward()
         with torch.no_grad():
             self.w = self.w - self.learning_rate * self.w.grad
             self.b = self.b - self.learning_rate * self.b.grad

@@ -5,11 +5,15 @@ from event.event_processor import *
 from globals import GlobalVariable as gv
 from target import Target as tg
 import torch
+import numpy as np
 
 logger = getLogger("EventParser")
 
 
+
 class EventParser:
+    succ_count = 0
+    fail_count = 0
     @staticmethod
     def parse(record: Record):
         vector= np.zeros([4,4])
@@ -162,12 +166,18 @@ class EventParser:
             pass
         elif record.subtype == 37:
             pass
-
+        morse_res = np.array(morse_res)
         if src_node and des_node:
             # print(vector)
+            # print("src_node: ", src_node.seq_len, "des_node: ", des_node.seq_len, "subtype: ", record.subtype)
             src_node.state_update(morse_res,subtype, vector, event_id)
             des_node.state_update(morse_res,subtype, vector, event_id)
+            gv.succ_count+=1
+        else:
+            gv.fail_count+=1
+            # print(gv.fail_count, "src_node: ",record.srcId, "des_node: ", record.desId, "subtype: ", record.subtype, record.Id)
         # print(event_id)
+
         gv.set_event_by_id(event_id, morse_res)
         # print(type(morse_res))
         return morse_res

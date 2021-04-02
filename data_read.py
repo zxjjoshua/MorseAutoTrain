@@ -42,7 +42,7 @@ def dataRead(fileName):
 
             elif record.type == -1:
                 # file node
-                if record.subtype > 0 and record.subtype < 5:
+                if 0 < record.subtype < 5:
                     newNode = record.getFileNode()
                     if not newNode:
                         logger.error("failed to get file node")
@@ -54,6 +54,13 @@ def dataRead(fileName):
                 elif record.subtype == -1:
                     # common file
                     newNode = record.getFileNode()
+                    if not newNode:
+                        logger.error("failed to get file node")
+                        continue
+                    if gv.exist_fileNode(newNode.id):
+                        logger.error("duplicate file node: " + str(newNode.id))
+                    else:
+                        gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype == 5:
                     # process node
                     # if no params, this process is released

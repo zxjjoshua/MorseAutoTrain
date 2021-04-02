@@ -1,4 +1,6 @@
 import numpy as np
+import torch
+
 
 class FileNode:
     def __init__(self, id: int, time: int, type: int, subtype: int):
@@ -50,4 +52,4 @@ class FileNode:
         res=[]
         for i in range(len(self.state_list)-length):
             res.append(self.state_list[i:i+length+1])
-        return res
+        return torch.tensor(res)

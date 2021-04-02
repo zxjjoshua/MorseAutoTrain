@@ -2,6 +2,7 @@ __all__ = ['ProcessNode']
 
 from target import Target as tg
 import numpy as np
+import torch
 # from globals import GlobalVariable as gv
 
 

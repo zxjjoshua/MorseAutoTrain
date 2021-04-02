@@ -24,15 +24,20 @@ numOfEpoch = 100
 batch_size = 10
 sequence_size = 100
 
+
 def Comp_Loss(out):
-    out_copy = torch.clone(out) ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
-    batch_avg = torch.mean(out_copy, 1, True) ## m by 1 by j
-    target = torch.repeat_interleave(batch_avg, torch.tensor([out.shape[1]]), dim=1) ## m by n by j
-    loss = torch.mean((out-target)**2)
+    out_copy = torch.clone(
+        out)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
+    batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
+    target = torch.repeat_interleave(batch_avg, torch.tensor([out.shape[1]]), dim=1)  ## m by n by j
+    loss = torch.mean((out - target) ** 2)
+    return loss
+
 
 activation_relu = torch.nn.ReLU()
 Loss_Function = Comp_Loss
 Learning_Rate = 0.001
+
 
 ### RNN model
 ### 1. RNN layer
@@ -42,6 +47,8 @@ Learning_Rate = 0.001
 ###    input: m by n by l, where m = # of batches, n = # of sequences in each batch, and l = hidden_dim
 ###    output: m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
 ###
+
+
 class RNNet(torch.nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, numOfRNNLayers, dropout_threshold=0.2):
         super(RNNet, self).__init__()
@@ -49,7 +56,7 @@ class RNNet(torch.nn.Module):
         self.numOfRNNLayers = numOfRNNLayers
         self.rnn_layer = torch.nn.RNN(input_dim, hidden_dim, numOfRNNLayers, batch_first=True)
         self.fc = torch.nn.Linear(hidden_dim, output_dim)
-    
+
     def forward(self, x):
         batch_size = x.size(0)
         h = self.init_hidden(batch_size)
@@ -57,31 +64,36 @@ class RNNet(torch.nn.Module):
         out = out.contiguous().view(-1, self.hidden_dim)
         out = self.fc(out)
         return out, hn
-    
+
     def init_hidden(self, batch_size):
         hidden = torch.zeros(self.numOfRNNLayers, batch_size, self.hidden_dim)
         return hidden
 
+
 model = RNNet(input_dim, hidden_dim, output_dim, numOfRNNLayers)
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=Learning_Rate)
-    
+
 
 def train_model(x):
+    x.requires_grad = True
     model.train()
     epoch_list = []
     loss_list = []
     error_list = []
     # counter = 1
     # avg_loss = 0
-    model.zero_grad()
+
+    optimizer.zero_grad()
     x.float().to(device)
     out, h = model(x.float())
     loss = Loss_Function(out)
     loss.backward()
-    rnn_grad = x.grad()
+    # print(x)
+    rnn_grad = x.grad
+    # print(rnn_grad)
     optimizer.step()
-        # avg_loss += loss.item()
+    # avg_loss += loss.item()
     # epoch_list.append(counter)
     # loss_list.append(avg_loss / len(train_loader))
     # error_list.append(evaluate_model())
@@ -89,10 +101,12 @@ def train_model(x):
     # return epoch_list, loss_list, error_list
     return rnn_grad
 
+
 def evaluate_model():
     # use current model to make prediction
     return 0
-           
+
+
 def draw_result(epoch_list, loss_list, error_list):
     fig, (ax1, ax2) = plt.subplots(1, 2)
     fig.tight_layout()
@@ -104,6 +118,6 @@ def draw_result(epoch_list, loss_list, error_list):
     ax2.legend()
     plt.subplots_adjust(wspace=0.5)
     plt.show()
-    
+
     print("lowest MSE loss: {} at epoch {}".format(min(loss_list), loss_list.index(min(loss_list))))
     print("lowest percentage error: {} at epoch {}".format(min(error_list), error_list.index(min(error_list))))
