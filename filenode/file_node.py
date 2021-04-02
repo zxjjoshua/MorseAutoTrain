@@ -46,7 +46,7 @@ class FileNode:
         self.event_type_list.append(event_type)
         self.seq_len += 1
 
-    def generate_sequence(self, length:5):
+    def generate_sequence(self, length:int=5):
         if self.seq_len<length:
             return []
         res=[]
