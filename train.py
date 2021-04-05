@@ -126,7 +126,9 @@ def back_propagate_batch(learn):
         node = process_node_list[node_id]
         sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
         need = gv.batch_size - cur_len
-        simple_net_grad: torch.tensor(100,5,12)
+        simple_net_grad: torch.ones(100,5,12)
+        final_grads_of_multiple_batches = []
+
         # print(type(sequence))
         if len(sequence) + cur_len > gv.batch_size:
             cur_batch += sequence[:need]
@@ -155,17 +157,28 @@ def back_propagate_batch(learn):
             rnn_grad = RNN.train_model(input_tensor)
             # input size: 100 * 5 * 12
             # output size: 100 * 5 * 12
-            final_grad = morse_train.back_propagate(input_tensor, event_type_list, event_list, rnn_grad)
-            print(final_grad)
-            # update weights
-            tg.a_b_setter(-learn * final_grad[0])
-            tg.a_e_setter(-learn * final_grad[1])
+            # final_grad = morse_train.back_propagate(input_tensor, event_type_list, event_list, rnn_grad)
+            # print(final_grad)
+            # # update weights
+            # tg.a_b_setter(-learn * final_grad[0])
+            # tg.a_e_setter(-learn * final_grad[1])
             # tg.benign_thresh_model_setter(final_grad[2])
             # tg.suspect_env_model_setter(final_grad[3])
             cur_batch = remain_batch[::]
             event_type_list = remain_event_type_list
             event_list = remain_event_list
             remain_batch = []
+
+            # calculate the final grads of loss wrt w,b in simplenet by combining grads from simplenet and grads from rnn
+            final_grad = torch.tensordot(simple_net_grad, rnn_grad, ([0, 1, 2], [0, 1, 2])) 
+            final_grads_of_multiple_batches.append(final_grad)
+
+    # update SimpleNet's weights
+    average_final_grads = sum(final_grads_of_multiple_batches)/len(final_grads_of_multiple_batches)
+    tg.a_b_setter(-learn * average_final_grads[0])
+    tg.a_e_setter(-learn * average_final_grads[1])
+    tg.benign_thresh_model_setter(average_final_grads[2])
+    tg.suspect_env_model_setter(average_final_grads[3])
 
     # cur_len = 0
     # cur_batch = []
