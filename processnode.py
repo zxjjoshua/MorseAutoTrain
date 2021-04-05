@@ -22,6 +22,7 @@ class ProcessNode:
         self.event_id_list = []
         self.event_type_list = []
         self.state_list = []
+        self.grad_list=[]
         self.cur_state = np.zeros([2,3])
         self.seq_len = 0
 
@@ -73,14 +74,18 @@ class ProcessNode:
         return self.event_type_list
 
     def state_update(self,state: np.array, event_type: int, event: np.array, event_id: int=None):
+        from globals import GlobalVariable as gv
         # print(event)
-        self.cur_state = state
-        self.state_list.append(state)
-        self.event_list.append(event)
         if event_id is not None:
+            self.cur_state = state
+            self.state_list.append(state)
+            self.event_list.append(event)
+
             self.event_id_list.append(event_id)
-        self.event_type_list.append(event_type)
-        self.seq_len += 1
+            grad = gv.get_morse_grad(event_id)
+            self.grad_list.append(grad)
+            self.event_type_list.append(event_type)
+            self.seq_len += 1
 
     def generate_sequence(self, batch_size=100, sequence_size=5):
         """
@@ -91,9 +96,27 @@ class ProcessNode:
         if self.seq_len < sequence_size:
             return []
         res = []
+        grad_res=[]
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
         for i in range(total_len):
             res.append(self.state_list[i:i + sequence_size])
+            grad_res.append(self.grad_list[i:i + sequence_size])
+        # if total_len < batch_size:
+        #     res += [[]] * (batch_size - total_len)
+        return [res, grad_res]
+
+    def generate_simple_net_grad_sequence(self, batch_size=100, sequence_size=5):
+        """
+        :param batch_size: how many sequences in a batch
+        :param sequence_size: how long a sequence is
+        :return: a batch of sequences
+        """
+        if self.seq_len < sequence_size:
+            return []
+        res = []
+        total_len = min(batch_size, self.seq_len - sequence_size + 1)
+        for i in range(total_len):
+            res.append(self.grad_list[i:i + sequence_size])
         # if total_len < batch_size:
         #     res += [[]] * (batch_size - total_len)
         return res

@@ -124,10 +124,11 @@ def back_propagate_batch(learn):
     remain_event_list = []
     for node_id in process_node_list:
         node = process_node_list[node_id]
-        sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+        # simple_net_grad: torch.ones(100, 5, 12)
+        [sequence, simple_net_grad] = node.generate_sequence(gv.batch_size, gv.sequence_size)
         need = gv.batch_size - cur_len
-        simple_net_grad: torch.tensor(100,5,12)
-        # print(type(sequence))
+
+        print(np.shape(simple_net_grad))
         if len(sequence) + cur_len > gv.batch_size:
             cur_batch += sequence[:need]
             cur_len = gv.batch_size

@@ -15,11 +15,11 @@ class EventParser:
 
     @staticmethod
     def parse(record: Record):
-        vector= np.zeros([4,4])
-        morse_res = np.zeros([1,12])
+        vector = np.zeros([4, 4])
+        morse_res = np.zeros([1, 12])
         src_id = record.srcId
         des_id = record.desId
-        event_id=record.Id
+        event_id = record.Id
         subtype = record.subtype
         src_node = None
         des_node = None
@@ -169,12 +169,13 @@ class EventParser:
         if src_node and des_node:
             # print(vector)
             # print("src_node: ", src_node.seq_len, "des_node: ", des_node.seq_len, "subtype: ", record.subtype)
-            src_node.state_update(morse_res,subtype, vector, event_id)
-            des_node.state_update(morse_res,subtype, vector, event_id)
-            gv.succ_count+=1
+            src_node.state_update(morse_res, subtype, vector, event_id)
+            des_node.state_update(morse_res, subtype, vector, event_id)
+            gv.succ_count += 1
         else:
-            gv.fail_count+=1
-            # print(gv.fail_count, "src_node: ",record.srcId, "des_node: ", record.desId, "subtype: ", record.subtype, record.Id)
+            gv.fail_count += 1
+            # print(gv.fail_count, "src_node: ",record.srcId, "des_node: ", record.desId, "subtype: ",
+            # record.subtype, record.Id)
         # print(event_id)
 
         gv.set_event_by_id(event_id, morse_res)
@@ -209,12 +210,12 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(),
+                  tg.get_benign_possibility(srcArray[1]).detach().numpy(),
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
-        benign_grad=tg.get_benign_thresh_grad()
-        susp_grad=tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, benign_grad+susp_grad)
+        benign_grad = tg.get_benign_thresh_grad()
+        susp_grad = tg.get_susp_thresh_grad()
+        gv.add_morse_grad(id, benign_grad + susp_grad)
         # print("params: ", params[2].detach().numpy())
         return np.array([eventArray, params, srcArray, desArray])
 
@@ -246,7 +247,8 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
+        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(),
+                  tg.get_benign_possibility(srcArray[1]).detach().numpy(),
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
@@ -254,7 +256,7 @@ class EventParser:
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
-    def process2process_parser(record: Record)->np.array:
+    def process2process_parser(record: Record) -> np.array:
         id = record.Id
         time = record.time
         subtype = record.subtype
