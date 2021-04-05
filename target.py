@@ -1,4 +1,5 @@
 import rnn_model.simple_network as simple_net
+import numpy as np
 
 
 class Target:
@@ -128,11 +129,11 @@ class Target:
         return cls.suspect_env_model(stag)
 
     @classmethod
-    def get_benign_thresh_grad(cls)-> list:
+    def get_benign_thresh_grad(cls)-> np.ndarray((1,2)):
         return cls.benign_thresh_model.backward()
 
     @classmethod
-    def get_susp_thresh_grad(cls) -> list:
+    def get_susp_thresh_grad(cls) -> np.ndarray((1,2)):
         return cls.suspect_env_model.backward()
 
     @classmethod

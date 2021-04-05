@@ -5,6 +5,7 @@ from event.event_processor import *
 from globals import GlobalVariable as gv
 from target import Target as tg
 import numpy as np
+import morse_train
 
 logger = getLogger("EventParser")
 
@@ -14,7 +15,13 @@ class EventParser:
     fail_count = 0
 
     @staticmethod
-    def parse(record: Record):
+    def parse(record: Record) -> np.ndarray:
+        '''
+        parse record data, and convert it to np.ndarray((1,12)),
+        if failed, np.zeros([1, 12]) will be returned.
+        :param record: Record
+        :return: morse_res, np.ndarray((1,12))
+        '''
         vector = np.zeros([4, 4])
         morse_res = np.zeros([1, 12])
         src_id = record.srcId
@@ -169,8 +176,16 @@ class EventParser:
         if src_node and des_node:
             # print(vector)
             # print("src_node: ", src_node.seq_len, "des_node: ", des_node.seq_len, "subtype: ", record.subtype)
-            src_node.state_update(morse_res, subtype, vector, event_id)
-            des_node.state_update(morse_res, subtype, vector, event_id)
+
+            # get morse_grad and simple_net grad, and do multiplication to get morse_simple_net_grad
+            # simple_net_grad: np.array(4)
+            # morse_grad: np.array(12, 4)
+            # morse_simple_net_grad: np.array(12, 4)
+            simple_net_grad=gv.get_morse_grad(event_id)
+            morse_grad=morse_train.get_morse_grad(record.subtype, vector)
+            morse_simple_net_grad = np.transpose(np.array([morse_grad[:, 2], morse_grad[:, 2], morse_grad[:, 3], morse_grad[:, 3]]))*simple_net_grad
+            src_node.state_update(morse_res, subtype, vector, morse_grad[:, 0:2], morse_simple_net_grad, event_id)
+            des_node.state_update(morse_res, subtype, vector, morse_grad[:, 0:2], morse_simple_net_grad, event_id)
             gv.succ_count += 1
         else:
             gv.fail_count += 1
@@ -183,7 +198,7 @@ class EventParser:
         return morse_res
 
     @staticmethod
-    def file2process_parser(record: Record) -> np.array:
+    def file2process_parser(record: Record) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -215,12 +230,12 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, benign_grad + susp_grad)
+        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
         # print("params: ", params[2].detach().numpy())
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
-    def process2file_parser(record: Record) -> np.array:
+    def process2file_parser(record: Record) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -252,11 +267,11 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, benign_grad + susp_grad)
+        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
-    def process2process_parser(record: Record) -> np.array:
+    def process2process_parser(record: Record) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -284,11 +299,11 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1]).item()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, benign_grad + susp_grad)
+        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
-    def file2file_parser(record: Record) -> np.array:
+    def file2file_parser(record: Record) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -317,5 +332,5 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, benign_grad + susp_grad)
+        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
         return np.array([eventArray, params, srcArray, desArray])

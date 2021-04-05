@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 class SimpleNet(nn.Module):
@@ -17,7 +18,7 @@ class SimpleNet(nn.Module):
 
     def backward(self):
         self.y.backward()
-        return [self.w.grad, self.b.grad]
+        return np.array([self.w.grad, self.b.grad])
 
     def update_weight(self, inner_grad, outer_grad):
         w_grad, b_grad = inner_grad

@@ -12,7 +12,7 @@ class GlobalVariable:
     processNodePidMap: Dict[int, int] = {}
     event_set: Dict[int, np.ndarray] = {}
 
-    simple_net_grad_set: Dict[int, list] = {}
+    simple_net_grad_set: Dict[int, np.ndarray] = {}
     # event_id: [benign_thresh_w_grad, benign_thresh_b_grad, susp_thresh_w_grad, susp_thresh_b_grad]
 
     # batch processing
@@ -90,13 +90,13 @@ class GlobalVariable:
 
     # -------------- grad dict ------------------ #
     @classmethod
-    def add_morse_grad(cls, event_id: int, grad_list: list):
+    def add_morse_grad(cls, event_id: int, grad_list: np.ndarray((1,4))):
         if event_id in cls.simple_net_grad_set:
             print("globals  morse_grad_add() : duplicate event id")
         cls.simple_net_grad_set[event_id]=grad_list
 
     @classmethod
-    def get_morse_grad(cls, event_id)->list:
+    def get_morse_grad(cls, event_id)->np.ndarray((1,4)):
         if event_id in cls.simple_net_grad_set:
             print("globals  morse_grad_get() : no such event")
         return cls.simple_net_grad_set[event_id]

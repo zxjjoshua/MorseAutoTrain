@@ -26,7 +26,7 @@ def back_propagate(batch, event_type_list, event_list, rnn_grad):
 
 
 def get_morse_grad(event_type, event):
-    morse_grad = np.ones([1, 12, 4, 4])
+    morse_grad = np.ones([12, 4])
     if event_type == 1:
         pass
     elif event_type == 4 or event_type == 5 or event_type == 6 or event_type == 7:
