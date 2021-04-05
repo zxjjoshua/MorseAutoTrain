@@ -5,11 +5,15 @@ import filenode as fn
 import record
 import numpy as np
 
+
 class GlobalVariable:
     fileNodeSet: Dict[int, fn.FileNode] = {}
     processNodeSet: Dict[int, pn.ProcessNode] = {}
     processNodePidMap: Dict[int, int] = {}
     event_set: Dict[int, np.ndarray] = {}
+
+    simple_net_grad_set: Dict[int, list] = {}
+    # event_id: [benign_thresh_w_grad, benign_thresh_b_grad, susp_thresh_w_grad, susp_thresh_b_grad]
 
     # batch processing
     node_list={}
@@ -84,7 +88,19 @@ class GlobalVariable:
     def add_node_list(cls, node: object):
         cls.node_list.append(node)
 
+    # -------------- grad dict ------------------ #
+    @classmethod
+    def add_morse_grad(cls, event_id: int, grad_list: list):
+        if event_id in cls.simple_net_grad_set:
+            print("globals  morse_grad_add() : duplicate event id")
+        cls.simple_net_grad_set[event_id]=grad_list
+
+    @classmethod
+    def get_morse_grad(cls, event_id)->list:
+        if event_id in cls.simple_net_grad_set:
+            print("globals  morse_grad_get() : no such event")
+        return cls.simple_net_grad_set[event_id]
+
     # -------------- testing ------------------ #
     succ_count=0
-
     fail_count=0

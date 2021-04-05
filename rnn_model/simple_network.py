@@ -12,19 +12,20 @@ class SimpleNet(nn.Module):
 
     def forward(self, x):
         self.y = (torch.tanh(self.w*x+self.b))
-        print("this is output ", self.y)
+        # print("this is output ", self.y)
         return self.y
 
-    def backward(self, grad=torch.tensor(1.0)):
-        if not isinstance(grad, torch.Tensor):
-            grad=torch.tensor(grad)
-        self.w.retain_grad()
-        self.b.retain_grad()
-        # self.y.backward(grad, retain_graph = True)
+    def backward(self):
         self.y.backward()
+        return [self.w.grad, self.b.grad]
+
+    def update_weight(self, inner_grad, outer_grad):
+        w_grad, b_grad = inner_grad
+        w_grad = w_grad * outer_grad
+        b_grad = b_grad * outer_grad
         with torch.no_grad():
-            self.w = self.w - self.learning_rate * self.w.grad
-            self.b = self.b - self.learning_rate * self.b.grad
+            self.w = self.w - self.learning_rate * w_grad
+            self.b = self.b - self.learning_rate * b_grad
             self.w.requires_grad = True
             self.b.requires_grad = True
 

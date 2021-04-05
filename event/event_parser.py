@@ -4,16 +4,15 @@ from processnode import ProcessNode
 from event.event_processor import *
 from globals import GlobalVariable as gv
 from target import Target as tg
-import torch
 import numpy as np
 
 logger = getLogger("EventParser")
 
 
-
 class EventParser:
     succ_count = 0
     fail_count = 0
+
     @staticmethod
     def parse(record: Record):
         vector= np.zeros([4,4])
@@ -213,6 +212,9 @@ class EventParser:
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
+        benign_grad=tg.get_benign_thresh_grad()
+        susp_grad=tg.get_susp_thresh_grad()
+        gv.add_morse_grad(id, benign_grad+susp_grad)
         # print("params: ", params[2].detach().numpy())
         return np.array([eventArray, params, srcArray, desArray])
 
@@ -246,6 +248,9 @@ class EventParser:
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).detach().numpy(),
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
+        benign_grad = tg.get_benign_thresh_grad()
+        susp_grad = tg.get_susp_thresh_grad()
+        gv.add_morse_grad(id, benign_grad + susp_grad)
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -275,6 +280,9 @@ class EventParser:
         desArray = destNode.get_matrix_array(4)
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).item(),
                   tg.get_susp_possibility(srcArray[1]).item()]
+        benign_grad = tg.get_benign_thresh_grad()
+        susp_grad = tg.get_susp_thresh_grad()
+        gv.add_morse_grad(id, benign_grad + susp_grad)
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -305,4 +313,7 @@ class EventParser:
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
+        benign_grad = tg.get_benign_thresh_grad()
+        susp_grad = tg.get_susp_thresh_grad()
+        gv.add_morse_grad(id, benign_grad + susp_grad)
         return np.array([eventArray, params, srcArray, desArray])

@@ -126,6 +126,7 @@ def back_propagate_batch(learn):
         node = process_node_list[node_id]
         sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
         need = gv.batch_size - cur_len
+        simple_net_grad: torch.tensor(100,5,12)
         # print(type(sequence))
         if len(sequence) + cur_len > gv.batch_size:
             cur_batch += sequence[:need]
@@ -149,19 +150,18 @@ def back_propagate_batch(learn):
         # 1*3
 
         if cur_len >= gv.batch_size:
+            print(len(cur_batch))
             input_tensor = torch.tensor(cur_batch)
-            print("inside")
             rnn_grad = RNN.train_model(input_tensor)
-            # 100*5*12 * 12*64* 64*64 * 3
-            # ? * ?
-
+            # input size: 100 * 5 * 12
+            # output size: 100 * 5 * 12
             final_grad = morse_train.back_propagate(input_tensor, event_type_list, event_list, rnn_grad)
             print(final_grad)
             # update weights
             tg.a_b_setter(-learn * final_grad[0])
             tg.a_e_setter(-learn * final_grad[1])
-            tg.benign_thresh_model_setter(final_grad[2])
-            tg.suspect_env_model_setter(final_grad[3])
+            # tg.benign_thresh_model_setter(final_grad[2])
+            # tg.suspect_env_model_setter(final_grad[3])
             cur_batch = remain_batch[::]
             event_type_list = remain_event_type_list
             event_list = remain_event_list

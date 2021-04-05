@@ -128,12 +128,20 @@ class Target:
         return cls.suspect_env_model(stag)
 
     @classmethod
+    def get_benign_thresh_grad(cls)-> list:
+        return cls.benign_thresh_model.backward()
+
+    @classmethod
+    def get_susp_thresh_grad(cls) -> list:
+        return cls.suspect_env_model.backward()
+
+    @classmethod
     def benign_thresh_backward(cls, grad: float):
         cls.benign_thresh_model.backward(grad)
 
     @classmethod
     def susp_thresh_backward(cls, grad: float):
-        cls.benign_thresh_model.backward(grad)
+        cls.suspect_env_model.backward(grad)
 
     # ------------------ weights setters ----------- # 
 
@@ -147,8 +155,8 @@ class Target:
 
     @classmethod
     def benign_thresh_model_setter(cls, grad):
-        cls.benign_thresh_model.backward(grad)
+        cls.benign_thresh_model.update_weight(grad)
 
     @classmethod
     def suspect_env_model_setter(cls, grad):
-        cls.benign_thresh_model.backward(grad)
+        cls.suspect_env_model.update_weight(grad)
