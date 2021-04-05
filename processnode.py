@@ -94,7 +94,7 @@ class ProcessNode:
         :return: a batch of sequences
         """
         if self.seq_len < sequence_size:
-            return []
+            return [None, None]
         res = []
         grad_res=[]
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
@@ -112,7 +112,7 @@ class ProcessNode:
         :return: a batch of sequences
         """
         if self.seq_len < sequence_size:
-            return []
+            return [None, None]
         res = []
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
         for i in range(total_len):
