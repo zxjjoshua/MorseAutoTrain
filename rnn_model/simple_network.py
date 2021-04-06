@@ -20,10 +20,10 @@ class SimpleNet(nn.Module):
         self.y.backward()
         return np.array([self.w.grad, self.b.grad])
 
-    def update_weight(self, inner_grad, outer_grad):
-        w_grad, b_grad = inner_grad
-        w_grad = w_grad * outer_grad
-        b_grad = b_grad * outer_grad
+    def update_weight(self, w_grad, b_grad):
+        # w_grad, b_grad = inner_grad
+        # w_grad = w_grad * outer_grad
+        # b_grad = b_grad * outer_grad
         with torch.no_grad():
             self.w = self.w - self.learning_rate * w_grad
             self.b = self.b - self.learning_rate * b_grad

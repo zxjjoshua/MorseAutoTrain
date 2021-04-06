@@ -155,9 +155,9 @@ class Target:
         cls.a_e = cls.a_e + final_a_e_grad
 
     @classmethod
-    def benign_thresh_model_setter(cls, grad):
-        cls.benign_thresh_model.update_weight(grad)
+    def benign_thresh_model_setter(cls, w_grad, b_grad):
+        cls.benign_thresh_model.update_weight(w_grad, b_grad)
 
     @classmethod
-    def suspect_env_model_setter(cls, grad):
-        cls.suspect_env_model.update_weight(grad)
+    def suspect_env_model_setter(cls, w_grad, b_grad):
+        cls.suspect_env_model.update_weight(w_grad, b_grad)
