@@ -1,5 +1,7 @@
 import numpy as np
 import math
+
+from numpy.core.numeric import tensordot
 import morse_train
 from processnode import ProcessNode
 from globals import GlobalVariable as gv
@@ -202,14 +204,15 @@ def back_propagate_batch(learn):
             final_grads_of_multiple_batches.append(final_grad)
 
     if len(final_grads_of_multiple_batches)>0:
-        average_final_grads = sum(final_grads_of_multiple_batches)/len(final_grads_of_multiple_batches)
+        simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
+        # average_final_grads = sum(final_grads_of_multiple_batches)/len(final_grads_of_multiple_batches)
 
-        tg.a_b_setter(-learn * average_final_grads[0])
-        tg.a_e_setter(-learn * average_final_grads[1])
+        tg.a_b_setter(-learn * simple_net_final_grad[0])
+        tg.a_e_setter(-learn * simple_net_final_grad[1])
 
         # update SimpleNet's weights
-        tg.benign_thresh_model_setter(average_final_grads[2])
-        tg.suspect_env_model_setter(average_final_grads[3])
+        tg.benign_thresh_model_setter(simple_net_final_grad[2])
+        tg.suspect_env_model_setter(simple_net_final_grad[3])
 
 
 
