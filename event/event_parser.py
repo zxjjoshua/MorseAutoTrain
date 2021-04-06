@@ -183,6 +183,7 @@ class EventParser:
             # morse_simple_net_grad: np.array(12, 4)
             simple_net_grad=gv.get_morse_grad(event_id)
             morse_grad=morse_train.get_morse_grad(record.subtype, vector)
+            morse_grad=np.array(morse_grad)
             morse_simple_net_grad = np.transpose(np.array([morse_grad[:, 2], morse_grad[:, 2], morse_grad[:, 3], morse_grad[:, 3]]))*simple_net_grad
             morse_grad=morse_grad[:, 0:2]
             src_node.state_update(morse_res, subtype, vector, morse_grad, morse_simple_net_grad, event_id)
@@ -268,7 +269,7 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1]).detach().numpy()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
+        gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -300,7 +301,7 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1]).item()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
+        gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])
 
     @staticmethod
@@ -333,5 +334,5 @@ class EventParser:
                   tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
-        gv.add_morse_grad(id, np.concatenate(benign_grad, susp_grad))
+        gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])

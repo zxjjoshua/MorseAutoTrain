@@ -97,7 +97,7 @@ class GlobalVariable:
 
     @classmethod
     def get_morse_grad(cls, event_id)->np.ndarray((1,4)):
-        if event_id in cls.simple_net_grad_set:
+        if event_id not in cls.simple_net_grad_set:
             print("globals  morse_grad_get() : no such event")
         return cls.simple_net_grad_set[event_id]
 

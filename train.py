@@ -153,7 +153,7 @@ def back_propagate_batch(learn):
         else:
             cur_batch += sequence[:need]
             cur_morse_grad_list += morse_grad[:need]
-            cur_simple_net_grad_list+= simple_net_grad[:need]
+            cur_simple_net_grad_list += simple_net_grad[:need]
             cur_len += len(sequence)
             cur_event_type_list += node.event_type_list[:need]
             cur_event_list += node.event_list[:need]
@@ -164,10 +164,11 @@ def back_propagate_batch(learn):
         # 100*5*12
 
         if cur_len >= gv.batch_size:
-
+            # print("cur_batch, size: ", np.shape(cur_batch), len(cur_batch[0][0]), cur_batch)
             input_tensor = torch.tensor(cur_batch)
-            morse_grad_tensor = torch.tensor(cur_morse_grad_list)
-            simple_net_grad_tensor=torch.tensor(cur_simple_net_grad_list)
+            simple_net_grad_tensor = torch.tensor(cur_simple_net_grad_list, dtype=torch.float)
+            morse_grad_tensor = torch.tensor(cur_morse_grad_list, dtype=torch.float)
+
             # input_tensor: (100, 5, 12)
             # morse_grad_tensor: (100, 5, 12, 2)
             # simple_net_grad_tensor: (100, 5, 12, 4)
@@ -185,25 +186,26 @@ def back_propagate_batch(learn):
             # tg.suspect_env_model_setter(final_grad[3])
 
             cur_batch = remain_batch[::]
-            cur_morse_grad_list=remain_morse_grad_list[::]
+            cur_morse_grad_list = remain_morse_grad_list[::]
             cur_simple_net_grad_list = remain_simple_net_grad_list[::]
             cur_event_type_list = remain_event_type_list[::]
             cur_event_list = remain_event_list[::]
-            cur_len=len(cur_batch)
+            cur_len = len(cur_batch)
 
             remain_batch = []
-            remain_event_list=[]
-            remain_event_type_list=[]
-            remain_morse_grad_list=[]
-            remain_simple_net_grad_list=[]
+            remain_event_list = []
+            remain_event_type_list = []
+            remain_morse_grad_list = []
+            remain_simple_net_grad_list = []
 
-            print(np.shape(simple_net_grad_tensor), np.shape(rnn_grad))
+            print(type(simple_net_grad_tensor), type(rnn_grad))
             # calculate the final grads of loss wrt w,b in simple_net by
             # combining grads from simple_net and grads from rnn
+
             final_grad = torch.tensordot(simple_net_grad_tensor, rnn_grad, ([0, 1, 2], [0, 1, 2]))
             final_grads_of_multiple_batches.append(final_grad)
 
-    if len(final_grads_of_multiple_batches)>0:
+    if len(final_grads_of_multiple_batches) > 0:
         simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
         # average_final_grads = sum(final_grads_of_multiple_batches)/len(final_grads_of_multiple_batches)
 
@@ -213,10 +215,6 @@ def back_propagate_batch(learn):
         # update SimpleNet's weights
         tg.benign_thresh_model_setter(simple_net_final_grad[2])
         tg.suspect_env_model_setter(simple_net_final_grad[3])
-
-
-
-
 
     # cur_len = 0
     # cur_batch = []

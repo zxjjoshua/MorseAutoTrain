@@ -94,7 +94,7 @@ class EventProcessor:
         final_tags = tags
         final_tags[0][1:3] = tags[1][:, 1:3]
 
-        res_tags = jnp.concatenate(tags.reshape(1, length), final_tags)
+        res_tags = jnp.append(tags.reshape(1, length), final_tags)
 
         return res_tags
 
@@ -121,7 +121,7 @@ class EventProcessor:
                                  jnp.minimum(tags[0, 1], tags[1, 1]) - tags[0, 1],
                                  jnp.minimum(tags[0, 2], tags[1, 2]) - tags[0, 2]],
                                 [0.0, 0.0, 0.0]])
-        res_tags = jnp.concatenate(tags.reshape(1,length), final_tags.reshape(1, length))
+        res_tags = jnp.append(tags.reshape(1,length), final_tags.reshape(1, length))
         return res_tags
 
     # @staticmethod
