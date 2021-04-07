@@ -4,6 +4,7 @@ from target import Target as tg
 import jax.numpy as jnp
 from jax import jacfwd, jacrev
 import jax
+from torch import Tensor
 
 logger=getLogger("EventProcessor")
 length = 2 * 3
@@ -48,6 +49,9 @@ class EventProcessor:
         # some values in the vector are torch tensor but not a number, so they are replaced by their data, losing the autograd trace
         print("left_matrix", left_matrix)
         print("vector", vector)
+        for i,l in enumerate(vector):
+            if isinstance(l, Tensor):
+                vector[i] = l.cpu().detach().numpy() 
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
 
