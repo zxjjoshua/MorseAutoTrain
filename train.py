@@ -127,6 +127,9 @@ def back_propagate_batch(learn):
     remain_simple_net_grad_list = []
     remain_morse_grad_list = []
 
+    simple_net_final_grad_of_multiple_batches = []
+    final_morse_grad_of_multiple_batches = []
+
     for node_id in process_node_list:
         node = process_node_list[node_id]
         [sequence, morse_grad, simple_net_grad] = node.generate_sequence(gv.batch_size, gv.sequence_size)
@@ -135,8 +138,7 @@ def back_propagate_batch(learn):
         # simple_net_grad: (?, 5, 12, 4)
 
         need = gv.batch_size - cur_len
-        simple_net_final_grad_of_multiple_batches = []
-
+        
         if len(sequence) + cur_len > gv.batch_size:
             cur_batch += sequence[:need]
             cur_simple_net_grad_list += simple_net_grad[:need]
@@ -204,16 +206,19 @@ def back_propagate_batch(learn):
 
             simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
             simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
+            final_morse_grad = torch.tensordot(rnn_grad, morse_grad_tensor, ([0, 1, 2], [0, 1, 2]))
+            final_morse_grad_of_multiple_batches.append(final_morse_grad)
+
 
     if len(simple_net_final_grad_of_multiple_batches) > 0:
-        average_final_grads = sum(simple_net_final_grad_of_multiple_batches) / len(simple_net_final_grad_of_multiple_batches)
-
-        # tg.a_b_setter(-learn * simple_net_final_grad[0])
-        # tg.a_e_setter(-learn * simple_net_final_grad[1])
+        average_final_simplenet_grads = sum(simple_net_final_grad_of_multiple_batches) / len(simple_net_final_grad_of_multiple_batches)
+        average_final_morse_grads = sum(final_morse_grad_of_multiple_batches) / len(final_morse_grad_of_multiple_batches)
+        tg.a_b_setter(-learn * average_final_morse_grads[0])
+        tg.a_e_setter(-learn * average_final_morse_grads[1])
 
         # update SimpleNet's weights
-        tg.benign_thresh_model_setter(average_final_grads[0], average_final_grads[1])
-        tg.suspect_env_model_setter(average_final_grads[2], average_final_grads[3])
+        tg.benign_thresh_model_setter(average_final_simplenet_grads[0], average_final_simplenet_grads[1])
+        tg.suspect_env_model_setter(average_final_simplenet_grads[2], average_final_simplenet_grads[3])
 
     # cur_len = 0
     # cur_batch = []
