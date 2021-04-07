@@ -135,7 +135,7 @@ def back_propagate_batch(learn):
         # simple_net_grad: (?, 5, 12, 4)
 
         need = gv.batch_size - cur_len
-        final_grads_of_multiple_batches = []
+        simple_net_final_grad_of_multiple_batches = []
 
         if len(sequence) + cur_len > gv.batch_size:
             cur_batch += sequence[:need]
@@ -202,19 +202,18 @@ def back_propagate_batch(learn):
             # calculate the final grads of loss wrt w,b in simple_net by
             # combining grads from simple_net and grads from rnn
 
-            final_grad = torch.tensordot(simple_net_grad_tensor, rnn_grad, ([0, 1, 2], [0, 1, 2]))
-            final_grads_of_multiple_batches.append(final_grad)
+            simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
+            simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
 
-    if len(final_grads_of_multiple_batches) > 0:
-        simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
-        # average_final_grads = sum(final_grads_of_multiple_batches)/len(final_grads_of_multiple_batches)
+    if len(simple_net_final_grad_of_multiple_batches) > 0:
+        average_final_grads = sum(simple_net_final_grad_of_multiple_batches) / len(simple_net_final_grad_of_multiple_batches)
 
-        tg.a_b_setter(-learn * simple_net_final_grad[0])
-        tg.a_e_setter(-learn * simple_net_final_grad[1])
+        # tg.a_b_setter(-learn * simple_net_final_grad[0])
+        # tg.a_e_setter(-learn * simple_net_final_grad[1])
 
         # update SimpleNet's weights
-        tg.benign_thresh_model_setter(simple_net_final_grad[2])
-        tg.suspect_env_model_setter(simple_net_final_grad[3])
+        tg.benign_thresh_model_setter(average_final_grads[0], average_final_grads[1])
+        tg.suspect_env_model_setter(average_final_grads[2], average_final_grads[3])
 
     # cur_len = 0
     # cur_batch = []
