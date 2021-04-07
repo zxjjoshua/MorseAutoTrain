@@ -210,6 +210,8 @@ def back_propagate_batch(learn):
             # print(simple_net_grad_tensor.is_cuda)
 
             simple_net_grad_tensor = simple_net_grad_tensor.to(device)
+            morse_grad_tensor = morse_grad_tensor.to(device)
+            
             simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
             simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
             final_morse_grad = torch.tensordot(rnn_grad, morse_grad_tensor, ([0, 1, 2], [0, 1, 2]))
