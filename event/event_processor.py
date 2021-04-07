@@ -53,6 +53,8 @@ class EventProcessor:
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
+                    print(type(vector))
+                    print(type(jax.ops.index[i, j]))
                     jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
                 elif isinstance(t, np.ndarray):
                     jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
