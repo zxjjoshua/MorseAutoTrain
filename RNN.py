@@ -89,6 +89,7 @@ def train_model(x):
     optimizer.zero_grad()
     # x.float().to(device)
     out, h = model(x.float())
+    out = out.to(device)
     loss = Loss_Function(out)
     loss.backward()
     # print(x)
