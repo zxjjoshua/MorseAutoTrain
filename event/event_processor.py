@@ -50,17 +50,19 @@ class EventProcessor:
         
         # print("left_matrix", left_matrix)
         # print("vector", vector)
-        print("vector", vector)
-        vector = jnp.array(vector)
+        # print("vector", vector)
+        # vector = jnp.array(vector)
         
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
-                    print(type(vector))
-                    print(type(jax.ops.index[i, j]))
-                    jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
+                    # print(type(vector))
+                    # print(type(jax.ops.index[i, j]))
+                    vector[i][j] = float(t.cpu().detach().numpy())
+                    # jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
                 elif isinstance(t, np.ndarray):
-                    jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
+                    vector[i][j] = t.astype(float)
+                    # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
 
         # print(vector)
         tmp = jnp.dot(left_matrix, vector)
