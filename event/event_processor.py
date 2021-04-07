@@ -53,9 +53,10 @@ class EventProcessor:
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
-                    vector[i][j] = float(t.cpu().detach().numpy())
+                    jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
                 else:
-                    vector[i][j] = t.astype(float)
+                    jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
+
         # print(vector)
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
