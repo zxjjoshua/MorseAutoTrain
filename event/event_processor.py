@@ -61,7 +61,7 @@ class EventProcessor:
                     vector[i][j] = float(t.cpu().detach().numpy())
                     # jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
                 elif isinstance(t, np.ndarray):
-                    vector[i][j] = t.astype(float)
+                    vector[i][j] = float(t)
                     # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
 
         print(vector)
