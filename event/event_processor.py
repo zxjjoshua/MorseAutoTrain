@@ -50,6 +50,7 @@ class EventProcessor:
         
         # print("left_matrix", left_matrix)
         # print("vector", vector)
+        vector = jnp.array(vector)
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
