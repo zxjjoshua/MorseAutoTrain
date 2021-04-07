@@ -71,11 +71,12 @@ class RNNet(torch.nn.Module):
 
 
 model = RNNet(input_dim, hidden_dim, output_dim, numOfRNNLayers)
-model.to(device)
+model = model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=Learning_Rate)
 
 
 def train_model(x):
+    x = x.to(device)
     x.requires_grad = True
     model.train()
     epoch_list = []
@@ -85,7 +86,7 @@ def train_model(x):
     # avg_loss = 0
 
     optimizer.zero_grad()
-    x.float().to(device)
+    # x.float().to(device)
     out, h = model(x.float())
     loss = Loss_Function(out)
     loss.backward()
