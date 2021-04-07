@@ -204,6 +204,9 @@ def back_propagate_batch(learn):
             # calculate the final grads of loss wrt w,b in simple_net by
             # combining grads from simple_net and grads from rnn
 
+            print(rnn_grad.is_cuda)
+            print(simple_net_grad_tensor.is_cuda)
+
             simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
             simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
             final_morse_grad = torch.tensordot(rnn_grad, morse_grad_tensor, ([0, 1, 2], [0, 1, 2]))
