@@ -60,6 +60,7 @@ class RNNet(torch.nn.Module):
     def forward(self, x):
         batch_size = x.size(0)
         h = self.init_hidden(batch_size)
+        h = h.to(device)
         out, hn = self.rnn_layer(x, h)
         out = out.contiguous().view(-1, self.hidden_dim)
         out = self.fc(out)
