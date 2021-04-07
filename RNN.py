@@ -29,10 +29,10 @@ def Comp_Loss(out):
     out_copy = torch.clone(
         out)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
     batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
-    print(batch_avg.is_cuda)
-    print(torch.tensor([out.shape[1]]).is_cuda)
+    # print(batch_avg.is_cuda)
+    # print(torch.tensor([out.shape[1]]).is_cuda)
     tmp = torch.tensor([out.shape[1]]).to(device)
-    print(tmp.is_cuda)
+    # print(tmp.is_cuda)
     target = torch.repeat_interleave(batch_avg, tmp, dim=1)  ## m by n by j
     loss = torch.mean((out - target) ** 2)
     return loss
