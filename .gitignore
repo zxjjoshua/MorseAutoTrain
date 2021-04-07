@@ -14,3 +14,7 @@ __pycache__/data_read.cpython-37.pyc
 
 # venv
 /venv/
+
+.vscode
+tmp
+playground.ipynb
