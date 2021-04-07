@@ -52,7 +52,7 @@ class EventProcessor:
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
-                    vector[i][j] = t.cpu().detach().numpy() 
+                    vector[i][j] = float(t.cpu().detach().numpy()) 
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
 
