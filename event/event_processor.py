@@ -64,7 +64,8 @@ class EventProcessor:
                     vector[i][j] = float(t)
                     # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
 
-        print(vector)
+        print("left_matrix", left_matrix)
+        print("vector", vector)
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
 
