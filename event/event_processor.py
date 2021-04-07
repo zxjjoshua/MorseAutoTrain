@@ -47,15 +47,16 @@ class EventProcessor:
         # print("right_matrix: ", right_matrix.shape)
         # print(vector)
         # some values in the vector are torch tensor but not a number, so they are replaced by their data, losing the autograd trace
-        print("left_matrix", left_matrix)
-        print("vector", vector)
+        
+        # print("left_matrix", left_matrix)
+        # print("vector", vector)
         for i, l in enumerate(vector):
             for j, t in enumerate(l): 
                 if isinstance(t, Tensor):
                     vector[i][j] = float(t.cpu().detach().numpy())
                 else:
-                    vector[i][j] = float(t) 
-        print(vector)
+                    vector[i][j] = t.astype(float)
+        # print(vector)
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
 
