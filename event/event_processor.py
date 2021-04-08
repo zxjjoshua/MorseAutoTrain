@@ -80,8 +80,12 @@ class EventProcessor:
         susp_mul = (1-benign_thresh) + susp_thresh
         dangerous_mul = (1-benign_thresh) + (1- susp_thresh)
 
-        print("a_b", type(a_b))
-        print("a_e", type(a_e))
+        # print("a_b", type(a_b))
+        # print("a_e", type(a_e))
+        if isinstance(a_b, Tensor):
+            a_b = float(a_b.cpu().detach().numpy())
+        if isinstance(a_e, Tensor):
+            a_e = float(a_e.cpu().detach().numpy())
         attenuation_b = jnp.array([[0, a_b, a_b], [0, 0, 0]])
         attenuation_e = jnp.array([[0, a_e, a_e], [0, 0, 0]])
 
