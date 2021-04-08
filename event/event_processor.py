@@ -80,10 +80,10 @@ class EventProcessor:
         susp_mul = (1-benign_thresh) + susp_thresh
         dangerous_mul = (1-benign_thresh) + (1- susp_thresh)
 
-        print(a_b)
-        print(a_e)
-        attenuation_b = jnp.array([[0, a_b, a_b], [0, 0, 0]])
-        attenuation_e = jnp.array([[0, a_e, a_e], [0, 0, 0]])
+        # print(a_b)
+        # print(a_e)
+        attenuation_b = jnp.array([[0, float(a_b.cpu().detach().numpy()), float(a_b.cpu().detach().numpy())], [0, 0, 0]])
+        attenuation_e = jnp.array([[0, float(a_e.cpu().detach().numpy()), float(a_e.cpu().detach().numpy())], [0, 0, 0]])
 
         tag_benign = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation_b, axis=0)[1:3])).reshape(1,length)
         tag_susp_env = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags + attenuation_e, axis=0)[1:3])).reshape(1,length)
