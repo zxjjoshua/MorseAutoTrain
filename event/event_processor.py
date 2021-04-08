@@ -30,6 +30,7 @@ class EventProcessor:
                     vector[i][j] = float(t)
                     # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
         vector.astype('float64')
+        print("vector", vector.dtype)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
