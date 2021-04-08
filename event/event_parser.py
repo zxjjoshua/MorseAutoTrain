@@ -265,8 +265,8 @@ class EventParser:
         desArray = destNode.get_matrix_array(4)
 
         params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(),
-                  tg.get_benign_possibility(srcArray[1]).detach().numpy(),
-                  tg.get_susp_possibility(srcArray[1]).detach().numpy()]
+                  tg.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
+                  tg.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
         benign_grad = tg.get_benign_thresh_grad()
         susp_grad = tg.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
