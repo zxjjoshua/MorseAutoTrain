@@ -64,14 +64,15 @@ class EventProcessor:
                     vector[i][j] = float(t)
                     # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
 
-        print("left_matrix", left_matrix)
-        print("vector", vector)
-        print(left_matrix.dtype)
-        print(vector.dtype)
-        for l in vector:
-            for t in l:
-                print(t.dtype)
-        print(type(vector))
+        # print("left_matrix", left_matrix)
+        # print("vector", vector)
+        # print(left_matrix.dtype)
+        # print(vector.dtype)
+        # for l in vector:
+        #     for t in l:
+        #         print(t.dtype)
+        # print(type(vector))
+        vector = vector.astype('float64')
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
 
