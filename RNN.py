@@ -10,7 +10,7 @@ import numpy as np
 is_cuda = torch.cuda.is_available()
 
 if is_cuda:
-    device = torch.device("cpu")
+    device = torch.device("cuda")
     print("GPU is available")
 else:
     device = torch.device("cpu")
