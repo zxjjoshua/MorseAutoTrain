@@ -19,6 +19,16 @@ class EventProcessor:
         # srcNode: sTag iTag cTag
         # desNode: sTag iTag cTag
         # print(vector)
+        for i, l in enumerate(vector):
+            for j, t in enumerate(l): 
+                if isinstance(t, Tensor):
+                    # print(type(vector))
+                    # print(type(jax.ops.index[i, j]))
+                    vector[i][j] = float(t.cpu().detach().numpy())
+                    # jax.ops.index_update(vector, jax.ops.index[i,j], float(t.cpu().detach().numpy()))
+                elif isinstance(t, np.ndarray):
+                    vector[i][j] = float(t)
+                    # jax.ops.index_update(vector, jax.ops.index[i,j], t.astype(float))
         vector.astype('float64')
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
