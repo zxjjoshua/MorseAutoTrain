@@ -202,7 +202,7 @@ def back_propagate_batch(learn):
             remain_morse_grad_list = []
             remain_simple_net_grad_list = []
 
-            print(type(simple_net_grad_tensor), type(rnn_grad))
+            # print(type(simple_net_grad_tensor), type(rnn_grad))
             # calculate the final grads of loss wrt w,b in simple_net by
             # combining grads from simple_net and grads from rnn
 
@@ -211,7 +211,7 @@ def back_propagate_batch(learn):
 
             simple_net_grad_tensor = simple_net_grad_tensor.to(device)
             morse_grad_tensor = morse_grad_tensor.to(device)
-            
+
             simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
             simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
             final_morse_grad = torch.tensordot(rnn_grad, morse_grad_tensor, ([0, 1, 2], [0, 1, 2]))

@@ -114,7 +114,7 @@ class ProcessNode:
             simple_net_grad_res.append(self.simple_net_grad_list[i:i + sequence_size])
         # if total_len < batch_size:
         #     res += [[]] * (batch_size - total_len)
-        print(np.shape(morse_grad_res))
+        # print(np.shape(morse_grad_res))
         return [res, morse_grad_res, simple_net_grad_res]
 
     def generate_simple_net_grad_sequence(self, batch_size=100, sequence_size=5):
