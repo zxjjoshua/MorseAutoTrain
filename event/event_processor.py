@@ -261,7 +261,7 @@ def get_read_grad(vector: jnp.array):
 
 def get_write_grad(vector: jnp.array
                    ):
-    print(vector.dtype)
+    vector = vector.astype('float64')
     grad = jacrev(EventProcessor.write_process)(vector)
     # [12 * 4 * 4]
     return grad[:,1,:]
