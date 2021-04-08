@@ -68,6 +68,9 @@ class EventProcessor:
         print("vector", vector)
         print(left_matrix.dtype)
         print(vector.dtype)
+        for l in vector:
+            for t in l:
+                print(t.dtype)
         print(type(vector))
         tmp = jnp.dot(left_matrix, vector)
         tags = jnp.dot(tmp, right_matrix)
