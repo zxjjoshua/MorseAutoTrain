@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 from tqdm import tqdm
 import numpy as np
+from globals import GlobalVariable as gv
 
 is_cuda = torch.cuda.is_available()
 
@@ -21,7 +22,7 @@ output_dim = 3
 hidden_dim = 64
 numOfRNNLayers = 1
 numOfEpoch = 100
-batch_size = 10
+batch_size = 5
 sequence_size = 100
 
 
