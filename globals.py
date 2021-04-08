@@ -17,7 +17,7 @@ class GlobalVariable:
 
     # batch processing
     node_list={}
-    batch_size = 50
+    batch_size = 5
     sequence_size = 5
     feature_size = 12
 
