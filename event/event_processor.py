@@ -80,6 +80,8 @@ class EventProcessor:
         susp_mul = (1-benign_thresh) + susp_thresh
         dangerous_mul = (1-benign_thresh) + (1- susp_thresh)
 
+        print(a_b)
+        print(a_e)
         attenuation_b = jnp.array([[0, a_b, a_b], [0, 0, 0]])
         attenuation_e = jnp.array([[0, a_e, a_e], [0, 0, 0]])
 
