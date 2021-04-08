@@ -22,6 +22,9 @@ class EventProcessor:
         vector.astype(np.float)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        print(left_matrix.dtype)
+        print(vector.dtype)
+        print(right_matrix.dtype)
         tags = jnp.dot(jnp.dot(left_matrix, vector), right_matrix)
         final_tags = (jax.ops.index_update(tags, jax.ops.index[0, 1:3], jnp.min(tags[:, 1:3], axis=0))).reshape(1,length)
 
