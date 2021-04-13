@@ -2,6 +2,7 @@ import numpy as np
 from logging import getLogger
 from target import Target as tg
 import jax.numpy as jnp
+from jax import jit
 from jax import jacfwd, jacrev
 import jax
 from torch import Tensor
@@ -263,19 +264,23 @@ class EventProcessor:
     def inject_process(vector: jnp.array):
         pass
 
+jrev = jit(jacrev(EventProcessor.write_process))
+
 
 def get_read_grad(vector: jnp.array):
     vector = vector.astype('float64')
-    grad = jacrev(EventProcessor.write_process)(vector)
+    grad = jrev(vector)
+    # grad = jit(jacrev(EventProcessor.write_process)(vector))
     # [12 * 4 * 4]
     return grad[:, 1, :]
     # [12 * 4]
 
 
+
 def get_write_grad(vector: jnp.array
                    ):
     vector = vector.astype('float64')
-    grad = jacrev(EventProcessor.write_process)(vector)
+    grad = jrev(vector)
     # [12 * 4 * 4]
     return grad[:,1,:]
     # [12 * 4]
@@ -283,7 +288,7 @@ def get_write_grad(vector: jnp.array
 
 def get_create_grad(vector: jnp.array):
     vector = vector.astype('float64')
-    grad = jacrev(EventProcessor.write_process)(vector)
+    grad = jrev(vector)
     # [12 * 4 * 4]
     return grad[:, 1, :]
     # [12 * 4]
@@ -291,7 +296,7 @@ def get_create_grad(vector: jnp.array):
 
 def get_load_grad(vector: jnp.array):
     vector = vector.astype('float64')
-    grad = jacrev(EventProcessor.write_process)(vector)
+    grad = jrev(vector)
     # [12 * 4 * 4]
     return grad[:, 1, :]
     # [12 * 4]
@@ -299,7 +304,7 @@ def get_load_grad(vector: jnp.array):
 
 def get_exec_grad(vector: jnp.array):
     vector = vector.astype('float64')
-    grad = jacrev(EventProcessor.write_process)(vector)
+    grad = jrev(vector)
     # [12 * 4 * 4]
     return grad[:, 1, :]
     # [12 * 4]

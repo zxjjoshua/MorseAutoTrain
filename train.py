@@ -177,7 +177,7 @@ def back_propagate_batch(learn):
             # morse_grad_tensor: (100, 5, 12, 2)
             # simple_net_grad_tensor: (100, 5, 12, 4)
 
-            print("getting into RNN")
+            # print("getting into RNN")
             rnn_grad = RNN.train_model(input_tensor)
             # input size: 100 * 5 * 12
             # output size: 100 * 5 * 12
