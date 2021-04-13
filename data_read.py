@@ -6,6 +6,7 @@ from globals import GlobalVariable as gv
 import train as tr
 import data_rearrange
 import train
+import os
 
 logger = getLogger("dataRead")
 
@@ -141,6 +142,7 @@ def pruningStr(line):
 
 
 if __name__ == "__main__":
+    os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
     logging.basicConfig(level=logging.INFO,
                         filename='debug.log',
                         filemode='w+',

@@ -167,6 +167,7 @@ def back_propagate_batch(learn):
         # feature_size: 12
         # 100*5*12
 
+        print("creating batch")
         if cur_len >= gv.batch_size:
             # print("cur_batch, size: ", np.shape(cur_batch), len(cur_batch[0][0]), cur_batch)
             input_tensor = torch.tensor(cur_batch)
@@ -177,7 +178,7 @@ def back_propagate_batch(learn):
             # morse_grad_tensor: (100, 5, 12, 2)
             # simple_net_grad_tensor: (100, 5, 12, 4)
 
-            # print("getting into RNN")
+            print("getting into RNN")
             rnn_grad = RNN.train_model(input_tensor)
             # input size: 100 * 5 * 12
             # output size: 100 * 5 * 12
