@@ -1,0 +1,8 @@
+{
+    "batch_size": 5,
+    "sequence_length": 5,
+    "feature_dimension": 12,
+    "device": "cuda",
+    "train_data": "./EventData/north_korea_apt_attack_data_debug.out",
+    "test_data": "./EventData/north_korea_apt_attack_data_debug.out"
+}

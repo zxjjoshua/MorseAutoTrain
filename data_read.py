@@ -17,8 +17,8 @@ logger = getLogger("dataRead")
 # global fileNodeSet
 
 
-def dataRead(fileName):
-    f = open(fileName, "r")
+def dataRead():
+    f = open(gv.train_data, "r")
     i = 0
     max_event_per_epoch = 100
     event_num = 0
@@ -149,4 +149,4 @@ if __name__ == "__main__":
                         format='%(asctime)s %(levelname)s:%(message)s',
                         datefmt='%m/%d/%Y %I:%M:%S %p')
 
-    dataRead("./EventData/north_korea_apt_attack_data_debug.out")
+    # dataRead(gv.train_data)

@@ -4,6 +4,7 @@ import processnode as pn
 import filenode as fn
 import record
 import numpy as np
+import torch
 
 
 class GlobalVariable:
@@ -20,6 +21,9 @@ class GlobalVariable:
     batch_size = 5
     sequence_size = 5
     feature_size = 12
+    device = torch.device('cpu')
+    train_data = ""
+    test_data = ""
 
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod

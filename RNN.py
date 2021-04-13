@@ -97,6 +97,7 @@ def train_model(x):
     out = out.to(device)
     loss = Loss_Function(out)
     loss.backward()
+    print("loss: ", loss.item())
     # print(x)
     rnn_grad = x.grad
     # print(rnn_grad)
