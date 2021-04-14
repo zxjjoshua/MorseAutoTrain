@@ -18,12 +18,16 @@ class GlobalVariable:
 
     # batch processing
     node_list={}
-    batch_size = 5
-    sequence_size = 5
-    feature_size = 12
+    batch_size = None
+    sequence_size = None
+    feature_size = None
     device = torch.device('cpu')
     train_data = ""
     test_data = ""
+    validation_data = ""
+    model_save_path = ""
+    early_stopping_patience = 10
+    early_stopping_model_queue = []
 
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod

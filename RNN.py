@@ -17,12 +17,12 @@ else:
     device = torch.device("cpu")
     print("GPU not available, CPU used")
 
-input_dim = 12
+input_dim = gv.feature_size
 output_dim = 3
 hidden_dim = 64
 numOfRNNLayers = 1
 numOfEpoch = 100
-batch_size = 5
+batch_size = gv.batch_size
 sequence_size = 100
 
 
