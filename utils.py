@@ -4,11 +4,12 @@ from RNN import model as rnn
 
 loaded_model_weights = None
 
-def dump_model():
+def dump_model(model_weights=None):
     '''
     save the trained model (morse, simplenet, rnn) to a binary file
     '''
-    model_weights = wrap_model()
+    if model_weights is None:
+        model_weights = wrap_model()
     model_dir = gv.model_save_path
     with open("model_weights.pkl", 'wb') as handle:
         pickle.dump(model_weights, handle, pickle.HIGHEST_PROTOCOL)
@@ -37,3 +38,6 @@ def wrap_model():
     model_weights["simplenet"]["1"] = tg.benign_thresh_model
     model_weights["simplenet"]["2"] = tg.suspect_env_model
     return model_weights
+
+def early_stop_triggered(loss1, loss2, threshold):
+    return ((loss2 - loss1) / loss1 > threshold):

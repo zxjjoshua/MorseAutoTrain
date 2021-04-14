@@ -5,6 +5,7 @@ import filenode as fn
 import record
 import numpy as np
 import torch
+from collections import deque
 
 
 class GlobalVariable:
@@ -26,8 +27,11 @@ class GlobalVariable:
     test_data = ""
     validation_data = ""
     model_save_path = ""
+
+    # early stopping related
     early_stopping_patience = 10
-    early_stopping_model_queue = []
+    early_stopping_model_queue = deque(maxlen=early_stopping_patience)
+    early_stopping_threshold = 9
 
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod

@@ -7,6 +7,7 @@ import math
 from tqdm import tqdm
 import numpy as np
 from globals import GlobalVariable as gv
+from utils import *
 
 is_cuda = torch.cuda.is_available()
 
@@ -96,8 +97,25 @@ def train_model(x):
     out, h = model(x.float())
     out = out.to(device)
     loss = Loss_Function(out)
-    loss.backward()
+    
     print("loss: ", loss.item())
+
+    model_weights = wrap_model()
+    gv.early_stopping_model_queue.append([loss.item(), model_weights])
+
+    # early stopping and model saving
+    if (len(gv.early_stopping_model_queue) == gv.early_stopping_patience and early_stop_triggered(loss.item(), gv.early_stopping_model_queue.popleft()[0], gv.early_stopping_threshold)):
+        print("========================= early stopping triggered =========================")
+        min_loss = min(list(gv.early_stopping_model_queue), key=lambda x: x[0])
+        print("minimum loss: ", min_loss)
+        popped_checkpoint = gv.early_stopping_model_queue.popleft()
+        while popped_checkpoint > min_loss:
+            popped_checkpoint = gv.early_stopping_model_queue.popleft()
+        dump_model(popped_checkpoint[1])
+        print("best model saved")
+        
+
+    loss.backward()
     # print(x)
     rnn_grad = x.grad
     # print(rnn_grad)
