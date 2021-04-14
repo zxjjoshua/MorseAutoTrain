@@ -1,6 +1,5 @@
 import pickle
-from RNN import model as rnn
-
+from globals import GlobalVariable as gv
 
 loaded_model_weights = None
 
@@ -26,7 +25,7 @@ def wrap_model():
     grap different sub models (morse, simplenet, rnn) together 
     '''
     from target import Target as tg
-    from globals import GlobalVariable as gv  
+      
     from RNN import model as rnn  
     model_weights = {
         "morse": {},
@@ -40,4 +39,4 @@ def wrap_model():
     return model_weights
 
 def early_stop_triggered(loss1, loss2, threshold):
-    return ((loss2 - loss1) / loss1 > threshold):
+    return loss2 > loss1 * threshold

@@ -27,11 +27,12 @@ class GlobalVariable:
     test_data = ""
     validation_data = ""
     model_save_path = ""
+    mode = "train"
 
     # early stopping related
-    early_stopping_patience = 10
+    early_stopping_patience = None
     early_stopping_model_queue = deque(maxlen=early_stopping_patience)
-    early_stopping_threshold = 9
+    early_stopping_threshold = None
 
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod

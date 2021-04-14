@@ -17,6 +17,9 @@ def start_experiment(config="config.json"):
     parser.add_argument("--test_data", nargs='?', default="./EventData/north_korea_apt_attack_data_debug.out", type=str)
     parser.add_argument("--validation_data", nargs='?', default="./EventData/north_korea_apt_attack_data_debug.out", type=str)
     parser.add_argument("--model_save_path", nargs='?', default="./trainedModels", type=str)
+    parser.add_argument("--mode", nargs="?", default="train", type=str)
+    parser.add_argument("--early_stopping_patience", nargs="?", default=10, type=int)
+    parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
 
     args = parser.parse_args()
     
@@ -29,6 +32,8 @@ def start_experiment(config="config.json"):
     gv.test_data = args.test_data
     gv.validation_data = args.validation_data
     gv.model_save_path = args.model_save_path
+    gv.early_stopping_patience = args.early_stopping_patience
+    gv.early_stopping_threshold = args.early_stopping_threshold
     from data_read import dataRead
     # with open(config, 'r') as config_json:
     #     config = json.load(config_json)

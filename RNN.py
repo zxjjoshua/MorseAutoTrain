@@ -7,6 +7,7 @@ import math
 from tqdm import tqdm
 import numpy as np
 from globals import GlobalVariable as gv
+import sys
 from utils import *
 
 is_cuda = torch.cuda.is_available()
@@ -104,7 +105,7 @@ def train_model(x):
     gv.early_stopping_model_queue.append([loss.item(), model_weights])
 
     # early stopping and model saving
-    if (len(gv.early_stopping_model_queue) == gv.early_stopping_patience and early_stop_triggered(loss.item(), gv.early_stopping_model_queue.popleft()[0], gv.early_stopping_threshold)):
+    if (len(gv.early_stopping_model_queue) == gv.early_stopping_patience and early_stop_triggered(gv.early_stopping_model_queue.popleft()[0], loss.item(), gv.early_stopping_threshold)):
         print("========================= early stopping triggered =========================")
         min_loss = min(list(gv.early_stopping_model_queue), key=lambda x: x[0])
         print("minimum loss: ", min_loss)
@@ -113,7 +114,7 @@ def train_model(x):
             popped_checkpoint = gv.early_stopping_model_queue.popleft()
         dump_model(popped_checkpoint[1])
         print("best model saved")
-        
+        sys.exit(0)
 
     loss.backward()
     # print(x)
