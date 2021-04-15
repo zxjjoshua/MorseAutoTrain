@@ -31,58 +31,58 @@ def sigmod_derivative(x):
     return x * (1 - x)
 
 
-class Train:
+# class Train:
 
-    def train(self, cases, labels, limit=10000, learn=0.05, correct=0.1):
-        for i in range(limit):
-            error = 0.0
-            for i in range(len(cases)):
-                label = labels[i]
-                case = cases[i]
-                error += self.back_propagate(case, label, learn, correct)
+#     def train(self, cases, labels, limit=10000, learn=0.05, correct=0.1):
+#         for i in range(limit):
+#             error = 0.0
+#             for i in range(len(cases)):
+#                 label = labels[i]
+#                 case = cases[i]
+#                 error += self.back_propagate(case, label, learn, correct)
 
-    def setup(self, ni, nh, no):
-        self.input_n = ni + 1
-        self.hidden_n = nh
-        self.output_n = no
-        # init cells
+#     def setup(self, ni, nh, no):
+#         self.input_n = ni + 1
+#         self.hidden_n = nh
+#         self.output_n = no
+#         # init cells
 
-        self.input_cells = [1.0] * self.input_n
-        self.hidden_cells = [1.0] * self.hidden_n
-        self.output_cells = [1.0] * self.output_n
-        # init weights
+#         self.input_cells = [1.0] * self.input_n
+#         self.hidden_cells = [1.0] * self.hidden_n
+#         self.output_cells = [1.0] * self.output_n
+#         # init weights
 
-        self.input_weights = make_matrix(self.input_n, self.hidden_n)
-        self.output_weights = make_matrix(self.hidden_n, self.output_n)
-        # random activate
+#         self.input_weights = make_matrix(self.input_n, self.hidden_n)
+#         self.output_weights = make_matrix(self.hidden_n, self.output_n)
+#         # random activate
 
-        for i in range(self.input_n):
-            for h in range(self.hidden_n):
-                self.input_weights[i][h] = rand(-0.2, 0.2)
-                for h in range(self.hidden_n):
-                    for o in range(self.output_n):
-                        self.output_weights[h][o] = rand(-2.0, 2.0)
-                        # init correction matrix
-                        self.input_correction = make_matrix(self.input_n, self.hidden_n)
-                        self.output_correction = make_matrix(self.hidden_n, self.output_n)
+#         for i in range(self.input_n):
+#             for h in range(self.hidden_n):
+#                 self.input_weights[i][h] = rand(-0.2, 0.2)
+#                 for h in range(self.hidden_n):
+#                     for o in range(self.output_n):
+#                         self.output_weights[h][o] = rand(-2.0, 2.0)
+#                         # init correction matrix
+#                         self.input_correction = make_matrix(self.input_n, self.hidden_n)
+#                         self.output_correction = make_matrix(self.hidden_n, self.output_n)
 
-    def forward(self, inputs):
-        # activate input layer
-        for i in range(self.input_n - 1):
-            self.input_cells[i] = inputs[i]
-        # activate hidden layer
-        for j in range(self.hidden_n):
-            total = 0.0
-            for i in range(self.input_n):
-                total += self.input_cells[i] * self.input_weights[i][j]
-            self.hidden_cells[j] = sigmoid(total)
-        # activate output layer
-        for k in range(self.output_n):
-            total = 0.0
-            for j in range(self.hidden_n):
-                total += self.hidden_cells[j] * self.output_weights[j][k]
-            self.output_cells[k] = sigmoid(total)
-        return self.output_cells[:]
+#     def forward(self, inputs):
+#         # activate input layer
+#         for i in range(self.input_n - 1):
+#             self.input_cells[i] = inputs[i]
+#         # activate hidden layer
+#         for j in range(self.hidden_n):
+#             total = 0.0
+#             for i in range(self.input_n):
+#                 total += self.input_cells[i] * self.input_weights[i][j]
+#             self.hidden_cells[j] = sigmoid(total)
+#         # activate output layer
+#         for k in range(self.output_n):
+#             total = 0.0
+#             for j in range(self.hidden_n):
+#                 total += self.hidden_cells[j] * self.output_weights[j][k]
+#             self.output_cells[k] = sigmoid(total)
+#         return self.output_cells[:]
 
 
 def back_propagate(case, learn):
@@ -110,6 +110,45 @@ def back_propagate(case, learn):
     tg.benign_thresh_model_setter(-learn * final_grad[2], -learn * final_grad[3])
     tg.suspect_env_model_setter(-learn * final_grad[4], -learn * final_grad[5])
 
+def predict():
+    rnn_model_path = gv.rnn_model_path
+    rnn = RNN.RNNet(input_dim=gv.feature_size, output_dim=3, numOfRNNLayers=1)
+    rnn.load_state_dict(torch.load(rnn_model_path))
+    rnn.eval()
+    process_node_list = gv.processNodeSet
+    # generate sequence
+    cur_len = 0
+    cur_batch = []
+    remain_batch = []
+    out_batches = []
+
+    for node_id in process_node_list:
+        node = process_node_list[node_id]
+        sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+        need = gv.batch_size - cur_len
+        if len(sequence) + cur_len > gv.batch_size:
+            cur_batch += sequence[:need]
+            cur_len = gv.batch_size
+            remain_batch = sequence[need:]
+        else:
+            cur_batch += sequence[:need]
+            cur_len += len(sequence)
+        if cur_len >= gv.batch_size:
+            input_tensor = torch.tensor(cur_batch)
+            input_tensor = input_tensor.to(device)
+            input_tensor.requires_grad = True
+            out, h = rnn(input_tensor.float())
+            out_batches.append(out)
+            cur_batch = remain_batch[::]
+            cur_len = len(cur_batch)
+            remain_batch = []
+
+    return out_batches
+
+
+
+
+
 
 def back_propagate_batch(learn):
     process_node_list = gv.processNodeSet
@@ -134,7 +173,7 @@ def back_propagate_batch(learn):
 
     for node_id in process_node_list:
         node = process_node_list[node_id]
-        [sequence, morse_grad, simple_net_grad] = node.generate_sequence(gv.batch_size, gv.sequence_size)
+        [sequence, morse_grad, simple_net_grad] = node.generate_sequence_and_grad(gv.batch_size, gv.sequence_size)
         # sequence: (?, 5, 12)
         # morse_grad: (?, 5, 12, 2)
         # simple_net_grad: (?, 5, 12, 4)

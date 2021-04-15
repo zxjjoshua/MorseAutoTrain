@@ -40,7 +40,7 @@ def post_train():
                 if isinstance(event, rec.Record):
                     ep.EventParser.parse(event)
                 
-        state_sequence = node.generate_sequence(5)
+        state_sequence = node.generate_sequence_and_grad(5)
         # do rnn process
         # calculate loss
         # do back propagate

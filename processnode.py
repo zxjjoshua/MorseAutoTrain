@@ -96,11 +96,11 @@ class ProcessNode:
             self.event_type_list.append(event_type)
             self.seq_len += 1
 
-    def generate_sequence(self, batch_size=100, sequence_size=5):
+    def generate_sequence_and_grad(self, batch_size=100, sequence_size=5):
         """
         :param batch_size: how many sequences in a batch
         :param sequence_size: how long a sequence is
-        :return: a batch of sequences
+        :return: a batch of sequences and their grads
         """
         if self.seq_len < sequence_size:
             return [[], [], []]
@@ -116,6 +116,20 @@ class ProcessNode:
         #     res += [[]] * (batch_size - total_len)
         # print(np.shape(morse_grad_res))
         return [res, morse_grad_res, simple_net_grad_res]
+
+    def generate_sequence(self, batch_size=100, sequence_size=5):
+        """
+        :param batch_size: how many sequences in a batch
+        :param sequence_size: how long a sequence is
+        :return: a batch of sequences
+        """
+        if self.seq_len < sequence_size:
+            return []
+        res = []
+        total_len = min(batch_size, self.seq_len - sequence_size + 1)
+        for i in range(total_len):
+            res.append(self.state_list[i:i + sequence_size])
+        return res
 
     def generate_simple_net_grad_sequence(self, batch_size=100, sequence_size=5):
         """
