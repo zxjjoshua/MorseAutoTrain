@@ -112,8 +112,9 @@ def back_propagate(case, learn):
 
 def predict():
     rnn_model_path = gv.rnn_model_path
-    rnn = RNN.RNNet(input_dim=gv.feature_size, output_dim=3, numOfRNNLayers=1)
+    rnn = RNN.RNNet(input_dim=gv.feature_size, hidden_dim=64, output_dim=3, numOfRNNLayers=1)
     rnn.load_state_dict(torch.load(rnn_model_path))
+    rnn.to(device)
     rnn.eval()
     process_node_list = gv.processNodeSet
     # generate sequence

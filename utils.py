@@ -49,5 +49,44 @@ def wrap_model():
     # model_weights["simplenet"]["2"] = tg.suspect_env_model
     return model_weights
 
+def save_pred_labels(pred_labels, file_path):
+    '''
+    save the prediction results of the test mode to a file
+    '''
+    with open(file_path, 'w') as f:
+        for line in pred_labels:
+            f.write(line+"\n")
+
+def evaluate_classification(pred_labels, gold_labels):
+    total = len(pred_labels)
+    # positive: benign
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+    for i in range(len(gold_labels)):
+        if (gold_labels[i] == pred_labels[i]):
+            if (pred_labels[i] == 'benign'):
+                tp += 1
+            elif (pred_labels[i] == 'malicious'):
+                tn += 1
+        else:
+            if (pred_labels[i] == 'benign'):
+                fp += 1
+            elif (pred_labels[i] == 'malicious'):
+                fn += 1
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    accuracy = (tp + tn) / (tp + tn + fp +fn)
+    f1 = 2 * precision * recall / (precision + recall)
+
+    print("======= evaluation results =======")
+    print("precision: ", precision)
+    print("recall: ", recall)
+    print("accuracy: ", accuracy)
+    print("f1: ", f1)
+
+    return precision, recall, accuracy, f1
+
 def early_stop_triggered(loss1, loss2, threshold):
     return loss2 > loss1 * threshold

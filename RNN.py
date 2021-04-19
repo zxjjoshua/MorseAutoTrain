@@ -68,7 +68,7 @@ class RNNet(torch.nn.Module):
         batch_size = x.size(0)
         h = self.init_hidden(batch_size)
         h = h.to(device)
-        out, hn = self.rnn_layer(x, h)
+        out, hn = self.rnn_layer(x)
         out = out.contiguous().view(-1, self.hidden_dim)
         out = self.fc(out)
         return out, hn
@@ -112,7 +112,7 @@ def train_model(x):
         popped_checkpoint = gv.early_stopping_model_queue.popleft()
         while popped_checkpoint > min_loss:
             popped_checkpoint = gv.early_stopping_model_queue.popleft()
-        dump_model(popped_checkpoint[1])
+        dump_model(popped_checkpoint[1], rnn=model)
         print("best model saved")
         sys.exit(0)
 

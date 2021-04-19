@@ -35,6 +35,7 @@ def start_experiment(config="config.json"):
     gv.model_save_path = args.model_save_path
     gv.early_stopping_patience = args.early_stopping_patience
     gv.early_stopping_threshold = args.early_stopping_threshold
+    gv.mode = args.mode
 
     if (gv.mode == "train"):
         from data_read import dataRead
@@ -67,8 +68,11 @@ def start_experiment(config="config.json"):
             # print(torch.tensor([out.shape[1]]).is_cuda)
             tmp = torch.tensor([out_batch.shape[1]])
             # print(tmp.is_cuda)
+            batch_avg = batch_avg.to(gv.device)
+            tmp = tmp.to(gv.device)
             target = torch.repeat_interleave(batch_avg, tmp, dim=1)  ## m by n by j
-            losses += (out_batch - target) ** 2
+            loss = (out_batch - target) ** 2
+            losses += torch.mean(loss, dim=1)
 
         # calculate the final accuracy of classification using labels from test data
         pred_labels = []
@@ -77,6 +81,8 @@ def start_experiment(config="config.json"):
                 pred_labels.append("benign")
             else:
                 pred_labels.append("malicious")
+
+        print(pred_labels)
 
 
 
