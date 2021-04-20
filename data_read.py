@@ -137,6 +137,7 @@ def dataRead():
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i += 1
+    f.close()
     # data_rearrange.post_train()
 
 

@@ -81,8 +81,11 @@ def start_experiment(config="config.json"):
                 pred_labels.append("benign")
             else:
                 pred_labels.append("malicious")
-
         print(pred_labels)
+        from utils import evaluate_classification
+        from prepare_gold_labels import prepare_gold_labels
+        gold_labels = prepare_gold_labels()
+        evaluate_classification(pred_labels, gold_labels)
 
 
 

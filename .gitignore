@@ -3,6 +3,9 @@
 __pycache__/
 __pycache__/data_read.cpython-37.pyc
 
+# data file
+EventData
+
 # idea file
 .idea/**
 
