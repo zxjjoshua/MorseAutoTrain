@@ -1,4 +1,4 @@
-import target as tg
+import morse as tg
 import numpy as np
 import event.event_processor as ep
 from globals import GlobalVariable as gv

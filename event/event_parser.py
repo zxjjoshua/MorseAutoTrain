@@ -3,7 +3,7 @@ from filenode import FileNode
 from processnode import ProcessNode
 from event.event_processor import *
 from globals import GlobalVariable as gv
-from target import Target as tg
+from morse import Morse as tg
 import numpy as np
 import morse_train
 

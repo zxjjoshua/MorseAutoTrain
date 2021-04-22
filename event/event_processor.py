@@ -1,6 +1,6 @@
 import numpy as np
 from logging import getLogger
-from target import Target as tg
+from morse import Morse as tg
 import jax.numpy as jnp
 from jax import jit
 from jax import jacfwd, jacrev

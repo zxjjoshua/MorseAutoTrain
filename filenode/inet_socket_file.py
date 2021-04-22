@@ -1,5 +1,5 @@
 from filenode.file_node import FileNode as fn
-from target import Target as tg
+from morse import Morse as tg
 import re
 
 trusted_ip_pattern=['^192.168.*.*$', '10.10.*.*', '8.8.8.8']

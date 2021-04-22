@@ -23,10 +23,12 @@ class GlobalVariable:
     batch_size = None
     sequence_size = None
     feature_size = None
+
     device = torch.device('cpu')
     train_data = None
     test_data = None
     validation_data = None
+    learning_rate = None
     model_save_path = ""
     mode = "train"
     morse_model_filename = "morse_model_weights.pkl"
@@ -39,6 +41,7 @@ class GlobalVariable:
     rnn_model_path = os.path.join(model_save_path, rnn_model_filename)
 
     # early stopping related
+    early_stopping_on = True
     early_stopping_patience = None
     early_stopping_model_queue = deque(maxlen=early_stopping_patience)
     early_stopping_threshold = None

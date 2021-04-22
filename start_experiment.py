@@ -10,6 +10,7 @@ def start_experiment(config="config.json"):
     os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
     parser = argparse.ArgumentParser(description="train or test the model")
     parser.add_argument("--batch_size", nargs='?', default=5, type=int)
+    parser.add_argument("--learning_rate", nargs='?', default=0.001, type=float)
     parser.add_argument("--sequence_length", nargs='?', default=5, type=int)
     parser.add_argument("--feature_dimension", nargs='?', default=12, type=int)
     parser.add_argument("--device", nargs='?', default="cuda", type=str)

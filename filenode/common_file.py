@@ -1,5 +1,5 @@
 from filenode.file_node import FileNode as fn
-from target import Target as tg
+from morse import Morse as tg
 
 
 class CommonFile(fn):

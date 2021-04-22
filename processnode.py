@@ -1,6 +1,6 @@
 __all__ = ['ProcessNode']
 
-from target import Target as tg
+from morse import Morse as tg
 import numpy as np
 import torch
 

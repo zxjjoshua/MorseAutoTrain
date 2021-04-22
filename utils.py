@@ -1,9 +1,10 @@
 import pickle
-
+import numpy as np
 import torch
-
+import math
 from globals import GlobalVariable as gv
 import os
+from record import Record
 
 loaded_model_weights = None
 
@@ -11,7 +12,7 @@ def dump_model(morse_model_weights=None, rnn=None):
     '''
     save the trained model (morse, simplenet, rnn) to a binary file
     '''
-    from target import Target as tg
+    from morse import Morse as tg
     if morse_model_weights is None:
         morse_model_weights = wrap_model()
 
@@ -37,7 +38,7 @@ def wrap_model():
     '''
     grap different sub models (morse, simplenet, rnn) together 
     '''
-    from target import Target as tg
+    from morse import Morse as tg
       
     from RNN import model as rnn  
     model_weights = {
@@ -90,3 +91,79 @@ def evaluate_classification(pred_labels, gold_labels):
 
 def early_stop_triggered(loss1, loss2, threshold):
     return loss2 > loss1 * threshold
+
+def rand(a, b):
+    return (b - a) * np.random.random() + a
+
+def make_matrix(m, n, fill=0.0):  # 创造一个指定大小的矩阵
+    mat = []
+    for i in range(m):
+        mat.append([fill] * n)
+    return mat
+
+def sigmoid(x):
+    return 1.0 / (1.0 + math.exp(-x))
+
+def sigmod_derivative(x):
+    return x * (1 - x)
+
+# data reading
+def readObj(f):
+    event = Record()
+    params = []
+    while True:
+        line = f.readline()
+        # print(line)
+        if not line:
+            break
+        # print(line)
+        if line[0] == "}":
+            break
+        line = pruningStr(line)
+        if line == "paras {":
+            while True:
+                data = f.readline()
+                data = pruningStr(data)
+                if data == "}":
+                    break
+                words = data.split(": ")
+                # print(words)
+                params.append(pruningStr(words[1]))
+        else:
+            words = line.split(": ")
+            # print(words)
+            if words[0] == "ID":
+                event.Id = int(pruningStr(words[1]))
+            elif words[0] == "type":
+                event.type = int(pruningStr(words[1]))
+            elif words[0] == "time":
+                event.time = int(pruningStr(words[1]))
+            elif words[0] == "subtype":
+                event.subtype = int(words[1])
+            elif words[0] == "size":
+                event.size = int(words[1])
+            elif words[0] == "srcId":
+                event.srcId = int(words[1])
+            elif words[0] == "desId":
+                event.desId = int(words[1])
+    if params:
+        event.params = params
+    return event
+
+
+def pruningStr(line):
+    if not line:
+        return line
+    start = 0
+    while start < len(line):
+        if line[start] == ' ' or line[start] == '\t':
+            start += 1
+        else:
+            break
+    if line[start] == "\"":
+        start += 1
+    if line[-1] == "\"":
+        line = line[:-1]
+    if line[-1] == '\n':
+        return line[start:-1]
+    return line[start:]

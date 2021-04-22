@@ -6,29 +6,13 @@ import morse_train
 from processnode import ProcessNode
 from globals import GlobalVariable as gv
 import RNN
-from target import Target as tg
+from morse import Morse as tg
 import torch
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 
-def rand(a, b):
-    return (b - a) * np.random.random() + a
 
-
-def make_matrix(m, n, fill=0.0):  # 创造一个指定大小的矩阵
-    mat = []
-    for i in range(m):
-        mat.append([fill] * n)
-    return mat
-
-
-def sigmoid(x):
-    return 1.0 / (1.0 + math.exp(-x))
-
-
-def sigmod_derivative(x):
-    return x * (1 - x)
 
 
 # class Train:
@@ -151,124 +135,7 @@ def predict():
 
 
 
-def back_propagate_batch(learn):
-    process_node_list = gv.processNodeSet
-    # feed forward, get the predicted result
 
-    # generate sequence
-    cur_len = 0
-    cur_batch = []
-    cur_simple_net_grad_list = []
-    cur_morse_grad_list = []
-    cur_event_type_list = []
-    cur_event_list = []
-
-    remain_batch = []
-    remain_event_type_list = []
-    remain_event_list = []
-    remain_simple_net_grad_list = []
-    remain_morse_grad_list = []
-
-    simple_net_final_grad_of_multiple_batches = []
-    final_morse_grad_of_multiple_batches = []
-
-    for node_id in process_node_list:
-        node = process_node_list[node_id]
-        [sequence, morse_grad, simple_net_grad] = node.generate_sequence_and_grad(gv.batch_size, gv.sequence_size)
-        # sequence: (?, 5, 12)
-        # morse_grad: (?, 5, 12, 2)
-        # simple_net_grad: (?, 5, 12, 4)
-
-        need = gv.batch_size - cur_len
-        
-        if len(sequence) + cur_len > gv.batch_size:
-            cur_batch += sequence[:need]
-            cur_simple_net_grad_list += simple_net_grad[:need]
-            cur_morse_grad_list += morse_grad[:need]
-            cur_len = gv.batch_size
-            cur_event_type_list += node.event_type_list[:need]
-            cur_event_list += node.event_list[:need]
-
-            remain_batch = sequence[need:]
-            remain_event_list = node.event_list[need:]
-            remain_event_type_list = node.event_type_list[need:]
-            remain_simple_net_grad_list = simple_net_grad[need:]
-            remain_morse_grad_list = morse_grad[need:]
-        else:
-            cur_batch += sequence[:need]
-            cur_morse_grad_list += morse_grad[:need]
-            cur_simple_net_grad_list += simple_net_grad[:need]
-            cur_len += len(sequence)
-            cur_event_type_list += node.event_type_list[:need]
-            cur_event_list += node.event_list[:need]
-        # batch_size * sequence_size * feature _size
-        # batch_size: 100
-        # sequence_size: 5
-        # feature_size: 12
-        # 100*5*12
-
-        # print("creating batch")
-        if cur_len >= gv.batch_size:
-            # print("cur_batch, size: ", np.shape(cur_batch), len(cur_batch[0][0]), cur_batch)
-            input_tensor = torch.tensor(cur_batch)
-            simple_net_grad_tensor = torch.tensor(cur_simple_net_grad_list, dtype=torch.float)
-            morse_grad_tensor = torch.tensor(cur_morse_grad_list, dtype=torch.float)
-
-            # input_tensor: (100, 5, 12)
-            # morse_grad_tensor: (100, 5, 12, 2)
-            # simple_net_grad_tensor: (100, 5, 12, 4)
-
-            # print("getting into RNN")
-            rnn_grad = RNN.train_model(input_tensor)
-            # input size: 100 * 5 * 12
-            # output size: 100 * 5 * 12
-
-            # final_grad = morse_train.back_propagate(input_tensor, event_type_list, event_list, rnn_grad)
-            # print(final_grad)
-            # # update weights
-            # tg.a_b_setter(-learn * final_grad[0])
-            # tg.a_e_setter(-learn * final_grad[1])
-            # tg.benign_thresh_model_setter(final_grad[2])
-            # tg.suspect_env_model_setter(final_grad[3])
-
-            cur_batch = remain_batch[::]
-            cur_morse_grad_list = remain_morse_grad_list[::]
-            cur_simple_net_grad_list = remain_simple_net_grad_list[::]
-            cur_event_type_list = remain_event_type_list[::]
-            cur_event_list = remain_event_list[::]
-            cur_len = len(cur_batch)
-
-            remain_batch = []
-            remain_event_list = []
-            remain_event_type_list = []
-            remain_morse_grad_list = []
-            remain_simple_net_grad_list = []
-
-            # print(type(simple_net_grad_tensor), type(rnn_grad))
-            # calculate the final grads of loss wrt w,b in simple_net by
-            # combining grads from simple_net and grads from rnn
-
-            # print(rnn_grad.is_cuda)
-            # print(simple_net_grad_tensor.is_cuda)
-
-            simple_net_grad_tensor = simple_net_grad_tensor.to(device)
-            morse_grad_tensor = morse_grad_tensor.to(device)
-
-            simple_net_final_grad = torch.tensordot(rnn_grad, simple_net_grad_tensor, ([0, 1, 2], [0, 1, 2]))
-            simple_net_final_grad_of_multiple_batches.append(simple_net_final_grad)
-            final_morse_grad = torch.tensordot(rnn_grad, morse_grad_tensor, ([0, 1, 2], [0, 1, 2]))
-            final_morse_grad_of_multiple_batches.append(final_morse_grad)
-
-
-    if len(simple_net_final_grad_of_multiple_batches) > 0:
-        average_final_simplenet_grads = sum(simple_net_final_grad_of_multiple_batches) / len(simple_net_final_grad_of_multiple_batches)
-        average_final_morse_grads = sum(final_morse_grad_of_multiple_batches) / len(final_morse_grad_of_multiple_batches)
-        tg.a_b_setter(-learn * average_final_morse_grads[0])
-        tg.a_e_setter(-learn * average_final_morse_grads[1])
-
-        # update SimpleNet's weights
-        tg.benign_thresh_model_setter(average_final_simplenet_grads[0], average_final_simplenet_grads[1])
-        tg.suspect_env_model_setter(average_final_simplenet_grads[2], average_final_simplenet_grads[3])
 
     # cur_len = 0
     # cur_batch = []
