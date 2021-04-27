@@ -2,6 +2,7 @@ from processnode import ProcessNode
 from filenode import FileNode, CommonFile, InetSocketFile, PipFile, UnixSocketFile
 from logging import getLogger
 import traceback
+from morse import Morse
 
 logger = getLogger("Record")
 
@@ -34,14 +35,14 @@ class Record:
     #     self.size=size
     #     self.params=params
 
-    def getFileNode(self) -> FileNode:
+    def getFileNode(self, morse: Morse) -> FileNode:
         if self.type != -1:
             return None
         try:
             if self.subtype == -1:
                 if (len(self.params) != 1):
                     return None
-                res = CommonFile(self.Id, self.time, self.type, self.subtype, self.params[0])
+                res = CommonFile(self.Id, self.time, self.type, self.subtype, self.params[0], morse.get_itag_benign(), morse.get_ctag_benign())
                 return res
             elif self.subtype == 1:
                 #shared memory
@@ -53,18 +54,18 @@ class Record:
             elif self.subtype == 2:
                 if (len(self.params) != 1):
                     return None
-                res = UnixSocketFile(self.Id, self.time, self.type, self.subtype, self.params[0])
+                res = UnixSocketFile(self.Id, self.time, self.type, self.subtype, self.params[0], morse)
                 return res
             elif self.subtype == 3:
                 if (len(self.params) != 3):
                     return None
                 res = InetSocketFile(self.Id, self.time, self.type, self.subtype, self.params[0], self.params[1],
-                                     self.params[2])
+                                     self.params[2], morse)
                 return res
             elif self.subtype == 4:
                 if (len(self.params) != 2):
                     return None
-                res = PipFile(self.Id, self.time, self.type, self.subtype, self.params[0], self.params[1])
+                res = PipFile(self.Id, self.time, self.type, self.subtype, self.params[0], self.params[1], morse.get_itag_benign(), morse.get_ctag_benign())
                 return res
             else:
                 print("unexpected filenode subtype", self.subtype)
@@ -78,7 +79,7 @@ class Record:
 
         return None
 
-    def getProcessNode(self):
+    def getProcessNode(self, morse: Morse = None):
         if self.type != -1:
             return None
         if self.subtype != 5:
@@ -88,5 +89,5 @@ class Record:
             # print(self.Id, self.type, self.subtype, self.params)
             return None
         processNode = ProcessNode(self.Id, self.time, self.type, self.subtype, self.params[0], self.params[1],
-                                  self.params[2], self.params[3])
+                                  self.params[2], self.params[3], morse)
         return processNode

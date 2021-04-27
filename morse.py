@@ -158,92 +158,70 @@ class Morse:
 
     # -------------- tag getters ------------------ #
 
-
     def get_benign_thresh(self) -> float:
         return self.benign
-
 
     def get_susp_thresh(self) -> float:
         return self.suspect_env
 
-
     def get_stag_benign(self) -> float:
         return self.stag_benign
-
 
     def get_itag_benign(self) -> float:
         return self.itag_benign
 
-
     def get_ctag_benign(self) -> float:
         return self.ctag_benign
-
 
     def get_stag_susp_env(self) -> float:
         return self.stag_suspect_env
 
-
     def get_itag_susp_env(self) -> float:
         return self.itag_suspect_env
-
 
     def get_ctag_susp_env(self) -> float:
         return self.ctag_suspect_env
 
-
     def get_stag_dangerous(self) -> float:
         return self.stag_dangerous
-
 
     def get_itag_dangerous(self) -> float:
         return self.itag_dangerous
 
-
     def get_ctag_dangerous(self) -> float:
         return self.ctag_dangerous
 
-
     def get_attenuate_susp_env(self) -> float:
         return self.a_e
-
 
     def get_attenuate_benign(self) -> float:
         return self.a_b
 
     # ------------------ tag setters -------------- #
 
-
     def set_stag_benign(self, val):
         self.stag_benign = val
-
 
     def set_itag_benign(self, val):
         self.itag_benign = val
 
-
     def set_ctag_benign(self, val):
         self.ctag_benign = val
-
 
     def set_stag_susp_env(self, val):
         self.stag_suspect_env = val
 
-
     def set_itag_susp_env(self, val):
         self.itag_suspect_env = val
-
 
     def set_ctag_susp_env(self, val):
         self.ctag_suspect_env = val
 
-
     def set_stag_dangerous(self, val):
         self.stag_dangerous = val
 
-
     def set_itag_dangerous(self, val):
         self.itag_dangerous = val
-
 
     def set_itag_dangerous(self, val):
         self.itag_dangerous = val
@@ -253,40 +231,31 @@ class Morse:
     def get_benign_possibility(self, stag: float):
         return self.benign_thresh_model(stag)
 
-
     def get_susp_possibility(self, stag: float):
         return self.suspect_env_model(stag)
-
 
     def get_benign_thresh_grad(self)-> np.ndarray((1,2)):
         return self.benign_thresh_model.backward()
 
-
     def get_susp_thresh_grad(self) -> np.ndarray((1,2)):
         return self.suspect_env_model.backward()
 
-
     def benign_thresh_backward(self, grad: float):
         self.benign_thresh_model.backward(grad)
-
 
     def susp_thresh_backward(self, grad: float):
         self.suspect_env_model.backward(grad)
 
     # ------------------ weights setters ----------- #
 
-
     def a_b_setter(self, final_a_b_grad):
         self.a_b = self.a_b + final_a_b_grad
-
 
     def a_e_setter(self, final_a_e_grad):
         self.a_e = self.a_e + final_a_e_grad
 
-
     def benign_thresh_model_setter(self, w_grad, b_grad):
         self.benign_thresh_model.update_weight(w_grad, b_grad)
-
 
     def suspect_env_model_setter(self, w_grad, b_grad):
         self.suspect_env_model.update_weight(w_grad, b_grad)

@@ -3,7 +3,7 @@ from filenode import FileNode
 from processnode import ProcessNode
 from event.event_processor import *
 from globals import GlobalVariable as gv
-from morse import Morse as tg
+from morse import Morse
 import numpy as np
 import morse_train
 
@@ -11,11 +11,13 @@ logger = getLogger("EventParser")
 
 
 class EventParser:
-    succ_count = 0
-    fail_count = 0
 
-    @staticmethod
-    def parse(record: Record) -> np.ndarray:
+    def __init__(self, morse: Morse):
+        self.succ_count = 0
+        self.fail_count = 0
+        self.event_processor = EventProcessor(morse)
+
+    def parse(self, record: Record, morse: Morse = None) -> np.ndarray:
         '''
         parse record data, and convert it to np.ndarray((1,12)),
         if failed, np.zeros([1, 12]) will be returned.
@@ -38,66 +40,66 @@ class EventParser:
         elif record.subtype == 3:
             pass
         elif record.subtype == 4:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.read_process(vector)
+            morse_res = self.event_processor.read_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 5:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.read_process(vector)
+            morse_res = self.event_processor.read_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 6:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.read_process(vector)
+            morse_res = self.event_processor.read_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 7:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.read_process(vector)
+            morse_res = self.event_processor.read_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
         elif record.subtype == 8:
-            vector = EventParser.file2process_parser(record)
+            vector = self.file2process_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.write_process(vector)
+            morse_res = self.event_processor.write_process(vector)
             src_node = gv.get_fileNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 9:
-            vector = EventParser.file2process_parser(record)
+            vector = self.file2process_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.write_process(vector)
+            morse_res = self.event_processor.write_process(vector)
             src_node = gv.get_fileNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 10:
-            vector = EventParser.file2process_parser(record)
+            vector = self.file2process_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.write_process(vector)
+            morse_res = self.event_processor.write_process(vector)
             src_node = gv.get_fileNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
         elif record.subtype == 11:
-            vector = EventParser.file2process_parser(record)
+            vector = self.file2process_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.write_process(vector)
+            morse_res = self.event_processor.write_process(vector)
             src_node = gv.get_fileNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
@@ -106,11 +108,11 @@ class EventParser:
         elif record.subtype == 13:
             pass
         elif record.subtype == 14:
-            vector = EventParser.process2process_parser(record)
+            vector = self.process2process_parser(record, morse)
             # print("this is vector ",vector)
             if vector is None:
                 return
-            morse_res = EventProcessor.exec_process(vector)
+            morse_res = self.event_processor.exec_process(vector, morse)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
@@ -139,10 +141,10 @@ class EventParser:
         elif record.subtype == 26:
             pass
         elif record.subtype == 27:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.read_process(vector)
+            morse_res = self.event_processor.read_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
@@ -161,10 +163,10 @@ class EventParser:
         elif record.subtype == 34:
             pass
         elif record.subtype == 35:
-            vector = EventParser.process2file_parser(record)
+            vector = self.process2file_parser(record, morse)
             if vector is None:
                 return
-            morse_res = EventProcessor.load_process(vector)
+            morse_res = self.event_processor.load_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_fileNode(des_id)
             pass
@@ -199,8 +201,7 @@ class EventParser:
         # print(type(morse_res))
         return morse_res
 
-    @staticmethod
-    def file2process_parser(record: Record) -> np.ndarray((4,4)):
+    def file2process_parser(self, record: Record, morse: Morse = None) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -227,17 +228,16 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(),
-                  tg.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
-                  tg.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
-        benign_grad = tg.get_benign_thresh_grad()
-        susp_grad = tg.get_susp_thresh_grad()
+        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(),
+                  morse.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
+                  morse.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
+        benign_grad = morse.get_benign_thresh_grad()
+        susp_grad = morse.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         # print("params: ", params[2].detach().numpy())
         return np.array([eventArray, params, srcArray, desArray])
 
-    @staticmethod
-    def process2file_parser(record: Record) -> np.ndarray((4,4)):
+    def process2file_parser(self, record: Record, morse: Morse) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -264,16 +264,15 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(),
-                  tg.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
-                  tg.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
-        benign_grad = tg.get_benign_thresh_grad()
-        susp_grad = tg.get_susp_thresh_grad()
+        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(),
+                  morse.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
+                  morse.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
+        benign_grad = morse.get_benign_thresh_grad()
+        susp_grad = morse.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])
 
-    @staticmethod
-    def process2process_parser(record: Record) -> np.ndarray((4,4)):
+    def process2process_parser(self, record: Record, morse: Morse) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -297,15 +296,14 @@ class EventParser:
         eventArray = [id, time, subtype, 0]
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]).item(),
-                  tg.get_susp_possibility(srcArray[1]).item()]
-        benign_grad = tg.get_benign_thresh_grad()
-        susp_grad = tg.get_susp_thresh_grad()
+        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(), morse.get_benign_possibility(srcArray[1]).item(),
+                  morse.get_susp_possibility(srcArray[1]).item()]
+        benign_grad = morse.get_benign_thresh_grad()
+        susp_grad = morse.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])
 
-    @staticmethod
-    def file2file_parser(record: Record) -> np.ndarray((4,4)):
+    def file2file_parser(self, record: Record, morse: Morse) -> np.ndarray((4,4)):
         id = record.Id
         time = record.time
         subtype = record.subtype
@@ -330,9 +328,9 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [tg.get_attenuate_benign(), tg.get_attenuate_susp_env(), tg.get_benign_possibility(srcArray[1]),
-                  tg.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
-        benign_grad = tg.get_benign_thresh_grad()
-        susp_grad = tg.get_susp_thresh_grad()
+        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(), morse.get_benign_possibility(srcArray[1]),
+                  morse.get_susp_possibility(srcArray[1])] + [0] * (4 - len(record.params))
+        benign_grad = morse.get_benign_thresh_grad()
+        susp_grad = morse.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])

@@ -13,32 +13,25 @@ from RNN import RNNet
 from RNN import Comp_Loss
 from logging import getLogger
 import event.event_parser as ep
+from event.event_parser import EventParser
 from morse import Morse
 from data_loader import DataLoader
 
-is_cuda = torch.cuda.is_available()
-
-if is_cuda:
-    device = torch.device("cuda")
-    print("GPU is available")
-else:
-    device = torch.device("cpu")
-    print("GPU not available, CPU used")
-
-numOfEpoch = 100
-batch_size = gv.batch_size
-sequence_size = 100
-activation_relu = torch.nn.ReLU()
-Loss_Function = Comp_Loss
-Learning_Rate = 0.001
+def train_model():
+    logger = getLogger("dataRead")
+    device = gv.device
+    numOfEpoch = 100
+    batch_size = gv.batch_size
+    sequence_size = 100
+    activation_relu = torch.nn.ReLU()
+    Loss_Function = Comp_Loss
+    Learning_Rate = 0.001
 
 
-logger = getLogger("dataRead")
-
-def train_model(x):
     # models initialization
     data_loader = DataLoader(processNodeSet=gv.processNodeSet)
     morse = Morse(batch_size=gv.batch_size, sequence_size=gv.sequence_size, data_loader=data_loader)
+    event_parser = EventParser(morse)
     rnn = RNNet(input_dim=gv.feature_size, hidden_dim=64, output_dim=3, numOfRNNLayers=1)
     rnn = rnn.to(device)
     rnn_optimizer = torch.optim.Adam(rnn.parameters(), lr=Learning_Rate)
@@ -58,7 +51,7 @@ def train_model(x):
             if record.type == 1:
                 # event type
                 event_num += 1
-                ep.EventParser.parse(record)
+                event_parser.parse(record, morse)
                 # tr.back_propagate(record, 0.5)
                 # data_rearrange.pre_process(record)
 
@@ -122,7 +115,7 @@ def train_model(x):
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
-                    newNode = record.getFileNode()
+                    newNode = record.getFileNode(morse)
                     if not newNode:
                         logger.error("failed to get file node")
                         continue
@@ -132,7 +125,7 @@ def train_model(x):
                         gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype == -1:
                     # common file
-                    newNode = record.getFileNode()
+                    newNode = record.getFileNode(morse)
                     if not newNode:
                         logger.error("failed to get file node")
                         continue
@@ -146,7 +139,7 @@ def train_model(x):
                     if not record.params:
                         gv.remove_processNode(record.Id)
                         continue
-                    newNode = record.getProcessNode()
+                    newNode = record.getProcessNode(morse)
                     if not newNode:
                         logger.error("failed to get process node")
                         continue

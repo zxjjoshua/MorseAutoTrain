@@ -5,6 +5,7 @@ from globals import GlobalVariable as gv
 import torch
 import logging
 import argparse
+from new_train import train_model
 
 def start_experiment(config="config.json"):
     os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
@@ -39,25 +40,13 @@ def start_experiment(config="config.json"):
     gv.mode = args.mode
 
     if (gv.mode == "train"):
-        from data_read import dataRead
-        # with open(config, 'r') as config_json:
-        #     config = json.load(config_json)
-        # gv.batch_size = config["batch_size"]
-        # gv.sequence_size = config["sequence_length"]
-        # gv.feature_size = config["feature_dimension"]
-        # if torch.cuda.is_available():
-        #     gv.device = torch.device(config["device"])
-        # gv.train_data = config["train_data"]
-        # gv.model_save_path = config["model_save_path"]
-
-
         logging.basicConfig(level=logging.INFO,
                             filename='debug.log',
                             filemode='w+',
                             format='%(asctime)s %(levelname)s:%(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
 
-        dataRead()
+        train_model()
     elif (gv.mode == "test"):
         from data_read import predict
         out_batches = predict()
