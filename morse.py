@@ -62,7 +62,8 @@ class Morse:
         final_morse_grad_of_multiple_batches = []
         forward_result_batches = []
 
-        for node in self.data_loader:
+        for node_id in self.data_loader:
+            node = self.data_loader[node_id]
             [sequence, morse_grad, simple_net_grad] = node.generate_sequence_and_grad(self.batch_size,
                                                                                       self.sequence_size)
             # sequence: (?, 5, 12)

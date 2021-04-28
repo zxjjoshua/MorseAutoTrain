@@ -1,4 +1,5 @@
 from utils import *
+from globals import GlobalVariable as gv
 
 ### RNN model
 ### 1. RNN layer
@@ -38,7 +39,7 @@ def Comp_Loss(out):
     # print(torch.tensor([out.shape[1]]).is_cuda)
     tmp = torch.tensor([out.shape[1]])
     # print(tmp.is_cuda)
-    target = torch.repeat_interleave(batch_avg, tmp, dim=1)  ## m by n by j
+    target = torch.repeat_interleave(batch_avg, tmp.to(gv.device), dim=1)  ## m by n by j
     loss = torch.mean((out - target) ** 2)
     return loss
 

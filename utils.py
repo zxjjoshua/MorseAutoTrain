@@ -18,14 +18,15 @@ def dump_model(morse = None, rnn = None, morse_model_weights = None):
         }
         morse_model_weights["morse"]["a_b"] = morse.a_b
         morse_model_weights["morse"]["a_e"] = morse.a_e
+        # save simplenet's weights
+        torch.save(morse.benign_thresh_model.state_dict(), gv.benign_thresh_model_path)
+        torch.save(morse.suspect_env_model.state_dict(), gv.suspect_env_model_path)
 
     # save the morse model's weights
     with open(gv.morse_model_path, 'wb') as handle:
         pickle.dump(morse_model_weights, handle, pickle.HIGHEST_PROTOCOL)
 
-    # save simplenet's weights
-    torch.save(morse.benign_thresh_model.state_dict(), gv.benign_thresh_model_path)
-    torch.save(morse.suspect_env_model.state_dict(), gv.suspect_env_model_path)
+
 
     # save rnn's weights
     torch.save(rnn.state_dict(), gv.rnn_model_path)
@@ -44,6 +45,8 @@ def wrap_model(morse):
 
     model_weights = {
         "morse": {},
+        "benigh_model": morse.benign_thresh_model.state_dict(),
+        "suspect_model": morse.suspect_env_model.state_dict()
     }
     model_weights["morse"]["a_b"] = morse.a_b
     model_weights["morse"]["a_e"] = morse.a_e

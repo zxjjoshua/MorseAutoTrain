@@ -112,7 +112,7 @@ class EventParser:
             # print("this is vector ",vector)
             if vector is None:
                 return
-            morse_res = self.event_processor.exec_process(vector, morse)
+            morse_res = self.event_processor.exec_process(vector)
             src_node = gv.get_processNode(src_id)
             des_node = gv.get_processNode(des_id)
             pass
