@@ -35,10 +35,12 @@ class GlobalVariable:
     benign_thresh_model_filename = "simplenet_benign_thresh.pt"
     suspect_env_model_filename = "simplenet_suspect_env.pt"
     rnn_model_filename = "rnn.pt"
-    morse_model_path = os.path.join(model_save_path, morse_model_filename)
-    benign_thresh_model_path = os.path.join(model_save_path, benign_thresh_model_filename)
-    suspect_env_model_path = os.path.join(model_save_path, suspect_env_model_filename)
-    rnn_model_path = os.path.join(model_save_path, rnn_model_filename)
+    morse_model_path = None
+    benign_thresh_model_path = None
+    suspect_env_model_path = None
+    rnn_model_path = None
+    project_path = None
+    save_models_dirname = None
 
     # early stopping related
     early_stopping_on = True

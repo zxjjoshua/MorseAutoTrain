@@ -60,6 +60,7 @@ class Morse:
 
         simple_net_final_grad_of_multiple_batches = []
         final_morse_grad_of_multiple_batches = []
+        forward_result_batches = []
 
         for node in self.data_loader:
             [sequence, morse_grad, simple_net_grad] = node.generate_sequence_and_grad(self.batch_size,
@@ -133,7 +134,8 @@ class Morse:
                 self.remain_morse_grad_list = []
                 self.remain_simple_net_grad_list = []
 
-                return input_tensor
+                forward_result_batches.append(input_tensor)
+                # return input_tensor
 
                 # print(type(simple_net_grad_tensor), type(rnn_grad))
                 # calculate the final grads of loss wrt w,b in simple_net by
@@ -142,6 +144,8 @@ class Morse:
                 # print(rnn_grad.is_cuda)
                 # print(simple_net_grad_tensor.is_cuda)
 
+        # self.data_loader.pos = 0
+        return forward_result_batches
 
 
         # if len(simple_net_final_grad_of_multiple_batches) > 0:

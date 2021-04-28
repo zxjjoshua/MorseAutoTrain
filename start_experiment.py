@@ -6,6 +6,7 @@ import torch
 import logging
 import argparse
 from new_train import train_model
+import time
 
 def start_experiment(config="config.json"):
     os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
@@ -15,17 +16,19 @@ def start_experiment(config="config.json"):
     parser.add_argument("--sequence_length", nargs='?', default=5, type=int)
     parser.add_argument("--feature_dimension", nargs='?', default=12, type=int)
     parser.add_argument("--device", nargs='?', default="cuda", type=str)
-    parser.add_argument("--train_data", nargs='?', default="./EventData/north_korea_apt_attack_data_debug.out", type=str)
-    parser.add_argument("--test_data", nargs='?', default="./EventData/north_korea_apt_attack_data_debug.out", type=str)
-    parser.add_argument("--validation_data", nargs='?', default="./EventData/north_korea_apt_attack_data_debug.out", type=str)
-    parser.add_argument("--model_save_path", nargs='?', default="./trainedModels", type=str)
+    parser.add_argument("--train_data", nargs='?', default="EventData/north_korea_apt_attack_data_debug.out", type=str)
+    parser.add_argument("--test_data", nargs='?', default="EventData/north_korea_apt_attack_data_debug.out", type=str)
+    parser.add_argument("--validation_data", nargs='?', default="EventData/north_korea_apt_attack_data_debug.out", type=str)
+    parser.add_argument("--model_save_path", nargs='?', default="trainedModels", type=str)
     parser.add_argument("--mode", nargs="?", default="train", type=str)
     parser.add_argument("--early_stopping_patience", nargs="?", default=10, type=int)
     parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
     parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-5, type=float)
+    gv.project_path = os.path.dirname(os.getcwd())
 
     args = parser.parse_args()
-    
+
+    gv.learning_rate = args.learning_rate
     gv.batch_size = args.batch_size
     gv.sequence_size = args.sequence_length
     gv.feature_size = args.feature_dimension
@@ -40,6 +43,13 @@ def start_experiment(config="config.json"):
     gv.mode = args.mode
 
     if (gv.mode == "train"):
+        gv.save_models_dirname = str(int(time.time()))
+        if not os.path.exists(os.path.join(gv.model_save_path, gv.save_models_dirname)):
+            os.makedirs(os.path.join(gv.model_save_path, gv.save_models_dirname))
+        gv.morse_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.morse_model_filename)
+        gv.benign_thresh_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.benign_thresh_model_filename)
+        gv.suspect_env_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.suspect_env_model_filename)
+        gv.rnn_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.rnn_model_filename)
         logging.basicConfig(level=logging.INFO,
                             filename='debug.log',
                             filemode='w+',
@@ -48,8 +58,8 @@ def start_experiment(config="config.json"):
 
         train_model()
     elif (gv.mode == "test"):
-        from data_read import predict
-        out_batches = predict()
+        from predict import predict_entry
+        out_batches = predict_entry()
         losses = []
         for out_batch in out_batches:
             out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim

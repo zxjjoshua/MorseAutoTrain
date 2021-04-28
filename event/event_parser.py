@@ -184,7 +184,7 @@ class EventParser:
             # morse_grad: np.array(12, 4)
             # morse_simple_net_grad: np.array(12, 4)
             simple_net_grad=gv.get_morse_grad(event_id)
-            morse_grad=morse_train.get_morse_grad(record.subtype, vector)
+            morse_grad=morse_train.get_morse_grad(record.subtype, vector, self.event_processor)
             morse_grad=np.array(morse_grad)
             morse_simple_net_grad = np.transpose(np.array([morse_grad[:, 2], morse_grad[:, 2], morse_grad[:, 3], morse_grad[:, 3]]))*simple_net_grad
             morse_grad=morse_grad[:, 0:2]
@@ -334,3 +334,4 @@ class EventParser:
         susp_grad = morse.get_susp_thresh_grad()
         gv.add_morse_grad(id, np.concatenate([benign_grad, susp_grad]))
         return np.array([eventArray, params, srcArray, desArray])
+

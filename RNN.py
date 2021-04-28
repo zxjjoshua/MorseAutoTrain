@@ -19,8 +19,8 @@ class RNNet(torch.nn.Module):
 
     def forward(self, x):
         batch_size = x.size(0)
-        h = self.init_hidden(batch_size)
-        h = h.to(device)
+        # h = self.init_hidden(batch_size)
+        # h = h.to(device)
         out, hn = self.rnn_layer(x)
         out = out.contiguous().view(-1, self.hidden_dim)
         out = self.fc(out)
@@ -36,7 +36,7 @@ def Comp_Loss(out):
     batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
     # print(batch_avg.is_cuda)
     # print(torch.tensor([out.shape[1]]).is_cuda)
-    tmp = torch.tensor([out.shape[1]]).to(device)
+    tmp = torch.tensor([out.shape[1]])
     # print(tmp.is_cuda)
     target = torch.repeat_interleave(batch_avg, tmp, dim=1)  ## m by n by j
     loss = torch.mean((out - target) ** 2)

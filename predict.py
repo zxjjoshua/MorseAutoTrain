@@ -1,21 +1,16 @@
+import numpy as np
+import math
 
-
-
-
+from numpy.core.numeric import tensordot
+import morse_train
+from processnode import ProcessNode
 from globals import GlobalVariable as gv
-import train as tr
-import data_rearrange
-import train
-import os
+import RNN
+from morse import Morse as tg
+import torch
+from utils import *
 
-
-
-
-# processNodeSet: Dict[int, ProcessNode]={}
-# fileNodeSet: Dict[int, FileNode]={}
-# global processNodeSet
-# global fileNodeSet
-def predict():
+def predict_entry():
     f = open(gv.test_data, "r")
     i = 0
     max_event_per_epoch = 100
@@ -35,7 +30,7 @@ def predict():
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    out_batches += train.predict()
+                    out_batches += predict()
                     event_num = 0
 
             elif record.type == -1:
@@ -77,18 +72,38 @@ def predict():
 
     return out_batches
 
+def predict():
+    rnn_model_path = gv.rnn_model_path
+    rnn = RNN.RNNet(input_dim=gv.feature_size, hidden_dim=64, output_dim=3, numOfRNNLayers=1)
+    rnn.load_state_dict(torch.load(rnn_model_path))
+    rnn.to(device)
+    rnn.eval()
+    process_node_list = gv.processNodeSet
+    # generate sequence
+    cur_len = 0
+    cur_batch = []
+    remain_batch = []
+    out_batches = []
 
+    for node_id in process_node_list:
+        node = process_node_list[node_id]
+        sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+        need = gv.batch_size - cur_len
+        if len(sequence) + cur_len > gv.batch_size:
+            cur_batch += sequence[:need]
+            cur_len = gv.batch_size
+            remain_batch = sequence[need:]
+        else:
+            cur_batch += sequence[:need]
+            cur_len += len(sequence)
+        if cur_len >= gv.batch_size:
+            input_tensor = torch.tensor(cur_batch)
+            input_tensor = input_tensor.to(device)
+            input_tensor.requires_grad = True
+            out, h = rnn(input_tensor.float())
+            out_batches.append(out)
+            cur_batch = remain_batch[::]
+            cur_len = len(cur_batch)
+            remain_batch = []
 
-
-
-
-
-if __name__ == "__main__":
-    os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
-    logging.basicConfig(level=logging.INFO,
-                        filename='debug.log',
-                        filemode='w+',
-                        format='%(asctime)s %(levelname)s:%(message)s',
-                        datefmt='%m/%d/%Y %I:%M:%S %p')
-
-    # dataRead(gv.train_data)
+    return out_batches

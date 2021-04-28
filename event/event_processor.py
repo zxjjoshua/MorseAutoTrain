@@ -15,6 +15,7 @@ class EventProcessor:
 
     def __init__(self, morse: Morse):
         self.morse = morse
+        self.jrev = jit(jacrev(self.write_process))
 
     def read_process(self, vector: jnp.array):
         # 2x4 4x4 4x3 -> 2x3
@@ -267,46 +268,40 @@ class EventProcessor:
     def inject_process(self, vector: jnp.array):
         pass
 
+    def get_read_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # grad = jit(jacrev(EventProcessor.write_process)(vector))
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
-jrev = jit(jacrev(EventProcessor.write_process))
+    def get_write_grad(self, vector: jnp.array
+                       ):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:,1,:]
+        # [12 * 4]
 
-def get_read_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # grad = jit(jacrev(EventProcessor.write_process)(vector))
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
+    def get_create_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
+    def get_load_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
-def get_write_grad(vector: jnp.array
-                   ):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:,1,:]
-    # [12 * 4]
-
-def get_create_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
-
-
-def get_load_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
-
-
-def get_exec_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
+    def get_exec_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 

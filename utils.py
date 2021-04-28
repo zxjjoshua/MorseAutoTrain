@@ -8,15 +8,16 @@ from record import Record
 
 loaded_model_weights = None
 
-def dump_model(morse = None, rnn = None):
+def dump_model(morse = None, rnn = None, morse_model_weights = None):
     '''
     save the trained model (morse, simplenet, rnn) to a binary file
     '''
-    morse_model_weights = {
-        "morse": {},
-    }
-    morse_model_weights["morse"]["a_b"] = morse.a_b
-    morse_model_weights["morse"]["a_e"] = morse.a_e
+    if morse_model_weights is None:
+        morse_model_weights = {
+            "morse": {},
+        }
+        morse_model_weights["morse"]["a_b"] = morse.a_b
+        morse_model_weights["morse"]["a_e"] = morse.a_e
 
     # save the morse model's weights
     with open(gv.morse_model_path, 'wb') as handle:
@@ -36,20 +37,17 @@ def load_model():
     with open(gv.morse_model_path, 'rb') as handle:
         loaded_model_weights = pickle.load(handle)
 
-# def wrap_model():
-#     '''
-#     grap different sub models (morse, simplenet, rnn) together
-#     '''
-#     from morse import Morse as tg
-#
-#     model_weights = {
-#         "morse": {},
-#     }
-#     model_weights["morse"]["a_b"] = tg.a_b
-#     model_weights["morse"]["a_e"] = tg.a_e
-#     # model_weights["simplenet"]["1"] = tg.benign_thresh_model
-#     # model_weights["simplenet"]["2"] = tg.suspect_env_model
-#     return model_weights
+def wrap_model(morse):
+    '''
+    grap different sub models (morse, simplenet, rnn) together
+    '''
+
+    model_weights = {
+        "morse": {},
+    }
+    model_weights["morse"]["a_b"] = morse.a_b
+    model_weights["morse"]["a_e"] = morse.a_e
+    return model_weights
 
 def save_pred_labels(pred_labels, file_path):
     '''
