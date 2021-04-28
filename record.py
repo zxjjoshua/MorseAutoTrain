@@ -79,7 +79,7 @@ class Record:
 
         return None
 
-    def getProcessNode(self, morse: Morse = None):
+    def getProcessNode(self, morse: Morse):
         if self.type != -1:
             return None
         if self.subtype != 5:

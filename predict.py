@@ -6,11 +6,33 @@ import morse_train
 from processnode import ProcessNode
 from globals import GlobalVariable as gv
 import RNN
-from morse import Morse as tg
+from morse import Morse
+from RNN import RNNet
+from event.event_parser import EventParser
 import torch
 from utils import *
+from RNN import Comp_Loss
+from logging import getLogger
 
 def predict_entry():
+    logger = getLogger("test mode")
+    device = gv.device
+    numOfEpoch = 100
+    batch_size = gv.batch_size
+    sequence_size = 100
+    activation_relu = torch.nn.ReLU()
+    Loss_Function = Comp_Loss
+    Learning_Rate = 0.001
+
+
+    # models initialization
+    # data_loader = DataLoader(processNodeSet=gv.processNodeSet)
+    morse = Morse(batch_size=gv.batch_size, sequence_size=gv.sequence_size, data_loader=gv.processNodeSet)
+    rnn = RNNet(input_dim=gv.feature_size, hidden_dim=64, output_dim=3, numOfRNNLayers=1)
+    morse, rnn = load_model(morse, rnn)
+    rnn = rnn.to(device)
+    event_parser = EventParser(morse)
+    rnn_optimizer = torch.optim.Adam(rnn.parameters(), lr=Learning_Rate)
     f = open(gv.test_data, "r")
     i = 0
     max_event_per_epoch = 100
@@ -26,17 +48,17 @@ def predict_entry():
             if record.type == 1:
                 # event type
                 event_num += 1
-                ep.EventParser.parse(record)
+                event_parser.parse(record, morse)
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    out_batches += predict()
+                    out_batches += predict(rnn)
                     event_num = 0
 
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
-                    newNode = record.getFileNode()
+                    newNode = record.getFileNode(morse)
                     if not newNode:
                         logger.error("failed to get file node")
                         continue
@@ -46,7 +68,7 @@ def predict_entry():
                         gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype == -1:
                     # common file
-                    newNode = record.getFileNode()
+                    newNode = record.getFileNode(morse)
                     if not newNode:
                         logger.error("failed to get file node")
                         continue
@@ -60,7 +82,7 @@ def predict_entry():
                     if not record.params:
                         gv.remove_processNode(record.Id)
                         continue
-                    newNode = record.getProcessNode()
+                    newNode = record.getProcessNode(morse)
                     if not newNode:
                         logger.error("failed to get process node")
                         continue
@@ -72,12 +94,7 @@ def predict_entry():
 
     return out_batches
 
-def predict():
-    rnn_model_path = gv.rnn_model_path
-    rnn = RNN.RNNet(input_dim=gv.feature_size, hidden_dim=64, output_dim=3, numOfRNNLayers=1)
-    rnn.load_state_dict(torch.load(rnn_model_path))
-    rnn.to(device)
-    rnn.eval()
+def predict(rnn):
     process_node_list = gv.processNodeSet
     # generate sequence
     cur_len = 0
@@ -98,7 +115,7 @@ def predict():
             cur_len += len(sequence)
         if cur_len >= gv.batch_size:
             input_tensor = torch.tensor(cur_batch)
-            input_tensor = input_tensor.to(device)
+            input_tensor = input_tensor.to(gv.device)
             input_tensor.requires_grad = True
             out, h = rnn(input_tensor.float())
             out_batches.append(out)

@@ -7,6 +7,9 @@ import logging
 import argparse
 from new_train import train_model
 import time
+from predict import predict_entry
+from utils import save_hyperparameters
+from utils import save_evaluation_results
 
 def start_experiment(config="config.json"):
     os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
@@ -24,7 +27,8 @@ def start_experiment(config="config.json"):
     parser.add_argument("--early_stopping_patience", nargs="?", default=10, type=int)
     parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
     parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-5, type=float)
-    gv.project_path = os.path.dirname(os.getcwd())
+    parser.add_argument("--load_model_from", nargs="?", default=None, type=str)
+    gv.project_path = os.getcwd()
 
     args = parser.parse_args()
 
@@ -43,22 +47,20 @@ def start_experiment(config="config.json"):
     gv.mode = args.mode
 
     if (gv.mode == "train"):
-        gv.save_models_dirname = str(int(time.time()))
-        if not os.path.exists(os.path.join(gv.model_save_path, gv.save_models_dirname)):
-            os.makedirs(os.path.join(gv.model_save_path, gv.save_models_dirname))
-        gv.morse_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.morse_model_filename)
-        gv.benign_thresh_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.benign_thresh_model_filename)
-        gv.suspect_env_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.suspect_env_model_filename)
-        gv.rnn_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.rnn_model_filename)
+        paths_setting(str(int(time.time())))
         logging.basicConfig(level=logging.INFO,
                             filename='debug.log',
                             filemode='w+',
                             format='%(asctime)s %(levelname)s:%(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p')
-
+        save_hyperparameters(args, "train")
         train_model()
     elif (gv.mode == "test"):
-        from predict import predict_entry
+        if args.load_model_from is None:
+            raise ValueError("A path must be given to load the trained model from")
+        gv.load_model_from = args.load_model_from
+        paths_setting(args.load_model_from)
+        save_hyperparameters(args, "test")
         out_batches = predict_entry()
         losses = []
         for out_batch in out_batches:
@@ -85,7 +87,18 @@ def start_experiment(config="config.json"):
         from utils import evaluate_classification
         from prepare_gold_labels import prepare_gold_labels
         gold_labels = prepare_gold_labels()
-        evaluate_classification(pred_labels, gold_labels)
+        precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
+        save_evaluation_results(precision, recall, accuracy, f1)
+
+def paths_setting(save_models_dirname):
+    gv.save_models_dirname = save_models_dirname
+    if not os.path.exists(os.path.join(gv.model_save_path, gv.save_models_dirname)):
+        os.makedirs(os.path.join(gv.model_save_path, gv.save_models_dirname))
+    gv.morse_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.morse_model_filename)
+    gv.benign_thresh_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname,
+                                               gv.benign_thresh_model_filename)
+    gv.suspect_env_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.suspect_env_model_filename)
+    gv.rnn_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.rnn_model_filename)
 
 
 

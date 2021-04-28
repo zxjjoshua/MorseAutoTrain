@@ -18,7 +18,7 @@ from morse import Morse
 from data_loader import DataLoader
 
 def train_model():
-    logger = getLogger("dataRead")
+    logger = getLogger("train mode")
     device = gv.device
     numOfEpoch = 100
     batch_size = gv.batch_size

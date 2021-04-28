@@ -48,6 +48,9 @@ class GlobalVariable:
     early_stopping_model_queue = deque(maxlen=early_stopping_patience)
     early_stopping_threshold = None
 
+    # for test mode
+    load_model_from = None
+
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod
     def get_fileNode(cls, index: int) -> Optional[fn.FileNode]:

@@ -15,28 +15,32 @@ def dump_model(morse = None, rnn = None, morse_model_weights = None):
     if morse_model_weights is None:
         morse_model_weights = {
             "morse": {},
+            "benigh_model": morse.benign_thresh_model.state_dict(),
+            "suspect_model": morse.suspect_env_model.state_dict()
         }
         morse_model_weights["morse"]["a_b"] = morse.a_b
         morse_model_weights["morse"]["a_e"] = morse.a_e
-        # save simplenet's weights
-        torch.save(morse.benign_thresh_model.state_dict(), gv.benign_thresh_model_path)
-        torch.save(morse.suspect_env_model.state_dict(), gv.suspect_env_model_path)
 
     # save the morse model's weights
     with open(gv.morse_model_path, 'wb') as handle:
         pickle.dump(morse_model_weights, handle, pickle.HIGHEST_PROTOCOL)
 
-
-
     # save rnn's weights
     torch.save(rnn.state_dict(), gv.rnn_model_path)
 
-def load_model():
+def load_model(morse, rnn):
     '''
     load a trained model from a binary file
     '''
     with open(gv.morse_model_path, 'rb') as handle:
         loaded_model_weights = pickle.load(handle)
+    morse.a_b = loaded_model_weights["morse"]["a_b"]
+    morse.a_e = loaded_model_weights["morse"]["a_e"]
+    rnn.load_state_dict(torch.load(gv.rnn_model_path))
+    rnn.eval()
+
+    return morse, rnn
+
 
 def wrap_model(morse):
     '''
@@ -51,6 +55,13 @@ def wrap_model(morse):
     model_weights["morse"]["a_b"] = morse.a_b
     model_weights["morse"]["a_e"] = morse.a_e
     return model_weights
+
+def save_hyperparameters(args, mode):
+    filename = mode + "_hyperparameters.txt"
+    p = os.path.join(gv.project_path, gv.model_save_path, gv.save_models_dirname, filename)
+    with open(p, 'w+') as f:
+        for arg_item in vars(args).items():
+            f.write(f"{arg_item[0]}: {arg_item[1]}\n")
 
 def save_pred_labels(pred_labels, file_path):
     '''
@@ -90,6 +101,16 @@ def evaluate_classification(pred_labels, gold_labels):
     print("f1: ", f1)
 
     return precision, recall, accuracy, f1
+
+def save_evaluation_results(precision, recall, accuracy, f1):
+    filename = "evaluation_results.txt"
+    p = os.path.join(gv.project_path, gv.model_save_path, gv.save_models_dirname, filename)
+    with open(p, 'w+') as f:
+        f.write("======= evaluation results =======\n")
+        f.write(f"precision: {precision}\n")
+        f.write(f"recall: {recall}\n")
+        f.write(f"accuracy: {accuracy}\n")
+        f.write(f"f1: {f1}\n")
 
 def early_stop_triggered(loss1, loss2, threshold):
     return loss2 > loss1 * threshold
