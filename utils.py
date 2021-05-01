@@ -99,6 +99,10 @@ def evaluate_classification(pred_labels, gold_labels):
     print("recall: ", recall)
     print("accuracy: ", accuracy)
     print("f1: ", f1)
+    print(f"tp: {tp}")
+    print(f"fp: {fp}")
+    print(f"tn: {tn}")
+    print(f"fn: {fn}")
 
     return precision, recall, accuracy, f1
 
