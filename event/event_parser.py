@@ -228,7 +228,15 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(),
+        p1 = morse.get_attenuate_benign()
+        if not isinstance(p1, float):
+            p1 = p1.cpu().detach().numpy()
+        p2 = morse.get_attenuate_susp_env()
+        if not isinstance(p2, float):
+            p2 = p2.cpu().detach().numpy()
+
+        params = [p1,
+                  p2,
                   morse.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
                   morse.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
         benign_grad = morse.get_benign_thresh_grad()
@@ -264,7 +272,14 @@ class EventParser:
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
 
-        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(),
+        p1 = morse.get_attenuate_benign()
+        if not isinstance(p1, float):
+            p1 = p1.cpu().detach().numpy()
+        p2 = morse.get_attenuate_susp_env()
+        if not isinstance(p2, float):
+            p2 = p2.cpu().detach().numpy()
+
+        params = [p1, p2,
                   morse.get_benign_possibility(srcArray[1]).cpu().detach().numpy(),
                   morse.get_susp_possibility(srcArray[1]).cpu().detach().numpy()]
         benign_grad = morse.get_benign_thresh_grad()
@@ -296,7 +311,15 @@ class EventParser:
         eventArray = [id, time, subtype, 0]
         srcArray = srcNode.get_matrix_array(4)
         desArray = destNode.get_matrix_array(4)
-        params = [morse.get_attenuate_benign(), morse.get_attenuate_susp_env(), morse.get_benign_possibility(srcArray[1]).item(),
+
+        p1 = morse.get_attenuate_benign()
+        if not isinstance(p1, float):
+            p1 = p1.cpu().detach().numpy()
+        p2 = morse.get_attenuate_susp_env()
+        if not isinstance(p2, float):
+            p2 = p2.cpu().detach().numpy()
+
+        params = [p1, p2, morse.get_benign_possibility(srcArray[1]).item(),
                   morse.get_susp_possibility(srcArray[1]).item()]
         benign_grad = morse.get_benign_thresh_grad()
         susp_grad = morse.get_susp_thresh_grad()

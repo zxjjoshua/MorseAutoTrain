@@ -24,6 +24,7 @@ def start_experiment(config="config.json"):
     parser.add_argument("--validation_data", nargs='?', default="EventData/north_korea_apt_attack_data_debug.out", type=str)
     parser.add_argument("--model_save_path", nargs='?', default="trainedModels", type=str)
     parser.add_argument("--mode", nargs="?", default="train", type=str)
+    parser.add_argument("--early_stopping_on", nargs="?", default="off", type=str)
     parser.add_argument("--early_stopping_patience", nargs="?", default=10, type=int)
     parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
     parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-5, type=float)
@@ -31,13 +32,16 @@ def start_experiment(config="config.json"):
     gv.project_path = os.getcwd()
 
     args = parser.parse_args()
-
+    if args.early_stopping_on == "on":
+        gv.early_stopping_on = True
+    else:
+        gv.early_stopping_on = False
     gv.learning_rate = args.learning_rate
     gv.batch_size = args.batch_size
     gv.sequence_size = args.sequence_length
     gv.feature_size = args.feature_dimension
     if torch.cuda.is_available():
-        gv.device = torch.device(args.device)
+        gv.device = torch.device("cuda:0")
     gv.train_data = args.train_data
     gv.test_data = args.test_data
     gv.validation_data = args.validation_data
