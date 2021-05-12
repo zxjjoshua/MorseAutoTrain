@@ -27,7 +27,7 @@ def start_experiment(config="config.json"):
     parser.add_argument("--early_stopping_on", nargs="?", default="off", type=str)
     parser.add_argument("--early_stopping_patience", nargs="?", default=10, type=int)
     parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
-    parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-5, type=float)
+    parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-11, type=float)
     parser.add_argument("--load_model_from", nargs="?", default=None, type=str)
     gv.project_path = os.getcwd()
 
@@ -41,7 +41,7 @@ def start_experiment(config="config.json"):
     gv.sequence_size = args.sequence_length
     gv.feature_size = args.feature_dimension
     if torch.cuda.is_available():
-        gv.device = torch.device("cuda:0")
+        gv.device = torch.device(args.device)
     gv.train_data = args.train_data
     gv.test_data = args.test_data
     gv.validation_data = args.validation_data
@@ -63,7 +63,7 @@ def start_experiment(config="config.json"):
         if args.load_model_from is None:
             raise ValueError("A path must be given to load the trained model from")
         gv.load_model_from = args.load_model_from
-        paths_setting(args.load_model_from)
+        test_id = paths_setting(args.load_model_from, mode="test")
         save_hyperparameters(args, "test")
         out_batches = predict_entry()
         losses = []
@@ -91,10 +91,23 @@ def start_experiment(config="config.json"):
         from utils import evaluate_classification
         from prepare_gold_labels import prepare_gold_labels
         gold_labels = prepare_gold_labels()
+        print("================================================")
+        print(f"TrainID: {args.load_model_from}")
+        print(f"TestID: {test_id}")
+        print(f"classification boundary threshold: {args.classify_boundary_threshold}")
         precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
         save_evaluation_results(precision, recall, accuracy, f1)
 
-def paths_setting(save_models_dirname):
+def paths_setting(save_models_dirname, mode="train"):
+    test_id = ""
+    # if mode == "test":
+    #     test_dir = os.path.join(gv.model_save_path, save_models_dirname, "tests")
+    #     if not os.path.exists(test_dir):
+    #         os.makedirs(test_dir)
+    #     test_id = str(int(time.time()))
+    #     save_models_dirname = os.path.join(test_dir, test_id)
+    #     if not os.path.exists(save_models_dirname):
+    #         os.makedirs(save_models_dirname)
     gv.save_models_dirname = save_models_dirname
     if not os.path.exists(os.path.join(gv.model_save_path, gv.save_models_dirname)):
         os.makedirs(os.path.join(gv.model_save_path, gv.save_models_dirname))
@@ -104,6 +117,7 @@ def paths_setting(save_models_dirname):
     gv.suspect_env_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.suspect_env_model_filename)
     gv.rnn_model_path = os.path.join(gv.model_save_path, gv.save_models_dirname, gv.rnn_model_filename)
 
+    return test_id
 
 
 if __name__ == '__main__':

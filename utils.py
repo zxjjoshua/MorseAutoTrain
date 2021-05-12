@@ -78,6 +78,7 @@ def evaluate_classification(pred_labels, gold_labels):
     tn = 0
     fp = 0
     fn = 0
+    precision, recall, accuracy, f1 = 0, 0, 0, 0
     for i in range(len(gold_labels)):
         if (gold_labels[i] == pred_labels[i]):
             if (pred_labels[i] == 'benign'):
@@ -89,10 +90,14 @@ def evaluate_classification(pred_labels, gold_labels):
                 fp += 1
             elif (pred_labels[i] == 'malicious'):
                 fn += 1
-    precision = tp / (tp + fp)
-    recall = tp / (tp + fn)
-    accuracy = (tp + tn) / (tp + tn + fp +fn)
-    f1 = 2 * precision * recall / (precision + recall)
+    if tp + fp != 0:
+        precision = tp / (tp + fp)
+    if tp + fn != 0:
+        recall = tp / (tp + fn)
+    if tp + tn + fp + fn != 0:
+        accuracy = (tp + tn) / (tp + tn + fp +fn)
+    if precision + recall != 0:
+        f1 = 2 * precision * recall / (precision + recall)
 
     print("======= evaluation results =======")
     print("precision: ", precision)

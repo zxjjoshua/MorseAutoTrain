@@ -110,7 +110,8 @@ def train_model():
                                                             simple_net_final_grad[1])
                             morse.suspect_env_model_setter(simple_net_final_grad[2],
                                                           simple_net_final_grad[3])
-
+                    print("===================== training ends ======================")
+                    print("last model saved")
                     dump_model(morse=morse, rnn=rnn)
 
             elif record.type == -1:
