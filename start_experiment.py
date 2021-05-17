@@ -107,8 +107,8 @@ def start_experiment(config="config.json"):
         tmp_batches=[] 
         with open(args.data_saved_path+"/data.txt", "w") as fp:
             for out_batch in out_batches:
+                print(type(out_batch))
                 out_copy=torch.clone(out_batch)
-                print(len(out_copy))
                 tmp_batches.append(out_copy.tolist())
             json.dump(tmp_batches, fp)
         
