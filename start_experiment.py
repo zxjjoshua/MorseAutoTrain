@@ -103,14 +103,14 @@ def start_experiment(config="config.json"):
         precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
         save_evaluation_results(precision, recall, accuracy, f1)
 '''
-        print(len(out_batches))
+        # print(len(out_batches))
         tmp_batches=[] 
         with open(args.data_saved_path+"/data.txt", "w") as fp:
             tmp_batches=[]
             for cur_snapshot in out_batches:
                 tmp=[]
                 for rnn_node in cur_snapshot:
-                    print(type(rnn_node))
+                    # print(type(rnn_node))
                     rnn_node_copy=torch.clone(rnn_node)
                     tmp.append(rnn_node_copy.tolist())
                 tmp_batches.append(tmp)

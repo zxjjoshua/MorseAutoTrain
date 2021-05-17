@@ -38,8 +38,7 @@ def predict_entry():
     max_event_per_epoch = 100
     event_num = 0
     out_batches = []
-    loop_count=0
-    while True and loop_count<10:
+    while True:
         line = f.readline()
         if not line:
             break
@@ -58,7 +57,6 @@ def predict_entry():
                     print(type(tmp))
                     out_batches.append(tmp)
                     event_num = 0
-                    loop_count+=1
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
