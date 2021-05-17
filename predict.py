@@ -52,7 +52,8 @@ def predict_entry():
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    out_batches += predict(rnn)
+                    tmp=predict(rnn)
+                    out_batches.append(tmp)
                     event_num = 0
 
             elif record.type == -1:
@@ -63,7 +64,8 @@ def predict_entry():
                         logger.error("failed to get file node")
                         continue
                     if gv.exist_fileNode(newNode.id):
-                        logger.error("duplicate file node: " + str(newNode.id))
+#                        logger.error("duplicate file node: " + str(newNode.id))
+                        pass
                     else:
                         gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype == -1:
@@ -73,7 +75,8 @@ def predict_entry():
                         logger.error("failed to get file node")
                         continue
                     if gv.exist_fileNode(newNode.id):
-                        logger.error("duplicate file node: " + str(newNode.id))
+ #                       logger.error("duplicate file node: " + str(newNode.id))
+                        pass
                     else:
                         gv.set_fileNode(newNode.id, newNode)
                 elif record.subtype == 5:

@@ -11,6 +11,9 @@ from predict import predict_entry
 from utils import save_hyperparameters
 from utils import save_evaluation_results
 
+import numpy as np
+import json
+
 def start_experiment(config="config.json"):
     os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
     parser = argparse.ArgumentParser(description="train or test the model")
@@ -29,6 +32,7 @@ def start_experiment(config="config.json"):
     parser.add_argument("--early_stopping_threshold", nargs="?", default=10, type=int)
     parser.add_argument("--classify_boundary_threshold", nargs="?", default=1e-11, type=float)
     parser.add_argument("--load_model_from", nargs="?", default=None, type=str)
+    parser.add_argument("--data_saved_path", nargs="?", default="Data", type=str)
     gv.project_path = os.getcwd()
 
     args = parser.parse_args()
@@ -66,9 +70,11 @@ def start_experiment(config="config.json"):
         test_id = paths_setting(args.load_model_from, mode="test")
         save_hyperparameters(args, "test")
         out_batches = predict_entry()
-        losses = []
+        '''losses = []
         for out_batch in out_batches:
             out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
+            
+            
             batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
             # print(batch_avg.is_cuda)
             # print(torch.tensor([out.shape[1]]).is_cuda)
@@ -79,7 +85,6 @@ def start_experiment(config="config.json"):
             target = torch.repeat_interleave(batch_avg, tmp, dim=1)  ## m by n by j
             loss = (out_batch - target) ** 2
             losses += torch.mean(loss, dim=1)
-
         # calculate the final accuracy of classification using labels from test data
         pred_labels = []
         for loss in losses:
@@ -87,7 +92,7 @@ def start_experiment(config="config.json"):
                 pred_labels.append("benign")
             else:
                 pred_labels.append("malicious")
-        print(pred_labels)
+        # print(pred_labels)
         from utils import evaluate_classification
         from prepare_gold_labels import prepare_gold_labels
         gold_labels = prepare_gold_labels()
@@ -97,6 +102,17 @@ def start_experiment(config="config.json"):
         print(f"classification boundary threshold: {args.classify_boundary_threshold}")
         precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
         save_evaluation_results(precision, recall, accuracy, f1)
+'''
+        print(len(out_batches))
+        tmp_batches=[] 
+        with open(args.data_saved_path+"/data.txt", "w") as fp:
+            for out_batch in out_batches:
+                out_copy=torch.clone(out_batch)
+                print(len(out_copy))
+                tmp_batches.append(out_copy.tolist())
+            json.dump(tmp_batches, fp)
+        
+
 
 def paths_setting(save_models_dirname, mode="train"):
     test_id = ""

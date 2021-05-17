@@ -11,6 +11,6 @@ mode: test
 early_stopping_on: off
 early_stopping_patience: 30
 early_stopping_threshold: 5
-classify_boundary_threshold: 1e-11
-load_model_from: 1620284921
+classify_boundary_threshold: 1e-10
+load_model_from: 1620928408
 data_saved_path: Data

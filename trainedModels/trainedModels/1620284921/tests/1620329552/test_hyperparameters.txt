@@ -2,7 +2,7 @@ batch_size: 5
 learning_rate: 0.001
 sequence_length: 5
 feature_dimension: 12
-device: cuda
+device: cuda:1
 train_data: EventData/north_korea_apt_attack_data_debug.out
 test_data: EventData/north_korea_apt_attack_data_debug.out
 validation_data: EventData/north_korea_apt_attack_data_debug.out
@@ -11,6 +11,5 @@ mode: test
 early_stopping_on: off
 early_stopping_patience: 30
 early_stopping_threshold: 5
-classify_boundary_threshold: 1e-11
+classify_boundary_threshold: 1e-10
 load_model_from: 1620284921
-data_saved_path: Data
