@@ -106,10 +106,14 @@ def start_experiment(config="config.json"):
         print(len(out_batches))
         tmp_batches=[] 
         with open(args.data_saved_path+"/data.txt", "w") as fp:
-            for out_batch in out_batches:
-                print(type(out_batch))
-                out_copy=torch.clone(out_batch)
-                tmp_batches.append(out_copy.tolist())
+            tmp_batches=[]
+            for cur_snapshot in out_batches:
+                tmp=[]
+                for rnn_node in cur_snapshot:
+                    print(type(rnn_node))
+                    rnn_node_copy=torch.clone(rnn_node)
+                    tmp.append(rnn_node_copy.tolist())
+                tmp_batches.append(tmp)
             json.dump(tmp_batches, fp)
         
 

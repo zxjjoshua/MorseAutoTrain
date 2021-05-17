@@ -39,7 +39,7 @@ def predict_entry():
     event_num = 0
     out_batches = []
     loop_count=0
-    while True and loop_count<20:
+    while True and loop_count<10:
         line = f.readline()
         if not line:
             break
