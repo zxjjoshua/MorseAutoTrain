@@ -54,6 +54,8 @@ def predict_entry():
                 # process batch-wise
                 if event_num == max_event_per_epoch:
                     tmp=predict(rnn)
+                    print(tmp)
+                    print(type(tmp))
                     out_batches.append(tmp)
                     event_num = 0
                     loop_count+=1
