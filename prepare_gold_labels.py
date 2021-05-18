@@ -1,4 +1,4 @@
-from data_read import readObj
+from utils import readObj
 
 def prepare_gold_labels():
     nk_malicious_ids = []

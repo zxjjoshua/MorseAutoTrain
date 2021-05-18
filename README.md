@@ -4,11 +4,20 @@
 We have 2 data sample in EventData/. you can set set data to run by setting file path in __main__() of data_read.py.
 
 ### how to run
-1. install dependency numpy==1.19.4, scipy==1.5.4, or run
+In the following example, training_data.out is used as the training data, north_korea_apt_attack_data_debug.out is used as the test data
+
+
+
+For training:
 ```
-pip install -r requirement.txt
+# In the MorseAutoTrain directory, execute
+. experiment_scripts/example_train.sh
 ```
-2. set data_read.py as main script, and run.
+For testing:
+```
+# In the MorseAutoTrain directory, execute
+. experiment_scripts/example_test.sh
+```
 
 ### main functions
 ##### data_read

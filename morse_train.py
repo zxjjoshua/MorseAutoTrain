@@ -1,4 +1,4 @@
-import target as tg
+import morse as tg
 import numpy as np
 import event.event_processor as ep
 from globals import GlobalVariable as gv
@@ -25,7 +25,7 @@ def back_propagate(batch, event_type_list, event_list, rnn_grad):
     return get_grad_from_morse_and_rnn(morse_grad, rnn_grad)
 
 
-def get_morse_grad(event_type, event):
+def get_morse_grad(event_type, event, ep):
     morse_grad = np.ones([12, 4])
     if event_type == 1:
         pass

@@ -23,25 +23,33 @@ class GlobalVariable:
     batch_size = None
     sequence_size = None
     feature_size = None
+
     device = torch.device('cpu')
     train_data = None
     test_data = None
     validation_data = None
+    learning_rate = None
     model_save_path = ""
     mode = "train"
     morse_model_filename = "morse_model_weights.pkl"
     benign_thresh_model_filename = "simplenet_benign_thresh.pt"
     suspect_env_model_filename = "simplenet_suspect_env.pt"
     rnn_model_filename = "rnn.pt"
-    morse_model_path = os.path.join(model_save_path, morse_model_filename)
-    benign_thresh_model_path = os.path.join(model_save_path, benign_thresh_model_filename)
-    suspect_env_model_path = os.path.join(model_save_path, suspect_env_model_filename)
-    rnn_model_path = os.path.join(model_save_path, rnn_model_filename)
+    morse_model_path = None
+    benign_thresh_model_path = None
+    suspect_env_model_path = None
+    rnn_model_path = None
+    project_path = None
+    save_models_dirname = None
 
     # early stopping related
+    early_stopping_on = True
     early_stopping_patience = None
     early_stopping_model_queue = deque(maxlen=early_stopping_patience)
     early_stopping_threshold = None
+
+    # for test mode
+    load_model_from = None
 
     # -------------- fileNodeSet and processNodeSet ----------------- #
     @classmethod

@@ -18,7 +18,7 @@ class SimpleNet(nn.Module):
 
     def backward(self):
         self.y.backward()
-        return np.array([self.w.grad, self.b.grad])
+        return np.array([self.w.grad.cpu(), self.b.grad.cpu()])
 
     def update_weight(self, w_grad, b_grad):
         # w_grad, b_grad = inner_grad

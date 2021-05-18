@@ -1,6 +1,6 @@
 import numpy as np
 from logging import getLogger
-from target import Target as tg
+from morse import Morse
 import jax.numpy as jnp
 from jax import jit
 from jax import jacfwd, jacrev
@@ -13,8 +13,11 @@ length = 2 * 3
 
 class EventProcessor:
 
-    @staticmethod
-    def read_process(vector: jnp.array):
+    def __init__(self, morse: Morse):
+        self.morse = morse
+        self.jrev = jit(jacrev(self.write_process))
+
+    def read_process(self, vector: jnp.array):
         # 2x4 4x4 4x3 -> 2x3
         # tags structure
         # srcNode: sTag iTag cTag
@@ -42,8 +45,9 @@ class EventProcessor:
         res_tags = jnp.append(tags, final_tags)
         return res_tags
 
-    @staticmethod
+
     def write_process(
+            self,
             vector: jnp.array
     ):
         benign_thresh = vector[1][2]
@@ -132,8 +136,8 @@ class EventProcessor:
     #
     #     pass
 
-    @staticmethod
-    def create_process(vector: jnp.array):
+
+    def create_process(self, vector: jnp.array):
         vector.astype(np.float)
         left_matrix = jnp.array([[0, 0, 1, 0], [0, 0, 0, 1]])
         right_matrix = jnp.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -158,8 +162,8 @@ class EventProcessor:
     #     # print("after processing")
     #     # print(res)
 
-    @staticmethod
-    def load_process(vector: jnp.array):
+
+    def load_process(self, vector: jnp.array):
         # print("load event: ")
         # print("before processing")
         # print(vector)
@@ -199,8 +203,9 @@ class EventProcessor:
     #     # print("after processing")
     #     # print(res)
 
-    @staticmethod
+
     def exec_process(
+            self,
             vector: jnp.array
     ):
         benign_thresh = vector[1][2]
@@ -220,7 +225,7 @@ class EventProcessor:
                                      1.0 - tags[0, 2]],
                                     [0, 0, 0]])
 
-        tag_susp_env = tags + jnp.array([[jnp.minimum(tg.get_susp_thresh(), tags[1, 1]) - tags[0, 0],
+        tag_susp_env = tags + jnp.array([[jnp.minimum(self.morse.get_susp_thresh(), tags[1, 1]) - tags[0, 0],
                                      jnp.minimum(tags[0, 1], tags[1, 1]) - tags[0, 1],
                                      jnp.minimum(tags[0, 2], tags[1, 2]) - tags[0, 2]],
                                     [0, 0, 0]])
@@ -260,52 +265,43 @@ class EventProcessor:
         res_tags = jnp.append(tags.reshape(1, length), final_tags)
         return res_tags
 
-    @staticmethod
-    def inject_process(vector: jnp.array):
+    def inject_process(self, vector: jnp.array):
         pass
 
-jrev = jit(jacrev(EventProcessor.write_process))
+    def get_read_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # grad = jit(jacrev(EventProcessor.write_process)(vector))
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
+    def get_write_grad(self, vector: jnp.array
+                       ):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:,1,:]
+        # [12 * 4]
 
-def get_read_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # grad = jit(jacrev(EventProcessor.write_process)(vector))
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
+    def get_create_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
+    def get_load_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
-
-def get_write_grad(vector: jnp.array
-                   ):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:,1,:]
-    # [12 * 4]
-
-
-def get_create_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
-
-
-def get_load_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
-
-
-def get_exec_grad(vector: jnp.array):
-    vector = vector.astype('float64')
-    grad = jrev(vector)
-    # [12 * 4 * 4]
-    return grad[:, 1, :]
-    # [12 * 4]
+    def get_exec_grad(self, vector: jnp.array):
+        vector = vector.astype('float64')
+        grad = self.jrev(vector)
+        # [12 * 4 * 4]
+        return grad[:, 1, :]
+        # [12 * 4]
 
