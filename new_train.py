@@ -45,6 +45,7 @@ def train_model():
 
     # training data
     train_out=[]
+    cur_turn = 0
 
     while True:
         # print(len(gv.processNodeSet))
@@ -63,6 +64,7 @@ def train_model():
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
+                    cur_turn+=1
                     rnn_grad = None
                     # while data_loader.has_next():
                     input_tensor_list = morse.forward(0.05)
@@ -73,6 +75,7 @@ def train_model():
                             rnn.train()
                             rnn_optimizer.zero_grad()
                             rnn_out, rnn_h = rnn(input_tensor.float())
+                            print(type(rnn_out))
                             train_out.append(rnn_out)
                             rnn_loss = Loss_Function(rnn_out)
                             rnn_loss.backward()
@@ -156,6 +159,8 @@ def train_model():
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i += 1
+        if cur_turn==10:
+            break
     f.close()
 
     with open('./Data/train.out', 'w') as f:
