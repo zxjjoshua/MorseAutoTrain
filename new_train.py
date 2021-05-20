@@ -44,7 +44,7 @@ def train_model():
     event_num = 0
 
     # training data
-    train_out=[]
+    batch_train=[]
     cur_turn = 0
 
     while True:
@@ -68,6 +68,7 @@ def train_model():
                     rnn_grad = None
                     # while data_loader.has_next():
                     input_tensor_list = morse.forward(0.05)
+                    train_out=[]
                     for input_tensor in input_tensor_list:
                         if input_tensor is not None:
                             input_tensor = input_tensor.to(device)
@@ -77,7 +78,7 @@ def train_model():
                             rnn_out, rnn_h = rnn(input_tensor.float())
                             rnn_out_copy=torch.clone(rnn_out)
                             print(type(rnn_out_copy))
-                            train_out.append(rnn_out_copy.tolist())
+                            train_out+=rnn_out_copy.tolist()
                             rnn_loss = Loss_Function(rnn_out)
                             rnn_loss.backward()
                             rnn_grad = input_tensor.grad
@@ -123,6 +124,7 @@ def train_model():
                     print("===================== training ends ======================")
                     print("last model saved")
                     dump_model(morse=morse, rnn=rnn)
+                    batch_train.append(train_out)
 
             elif record.type == -1:
                 # file node
@@ -165,7 +167,7 @@ def train_model():
     f.close()
 
     with open('./Data/train.out', 'w') as f:
-        json.dump(train_out, f)
+        json.dump(batch_train, f)
 
     return rnn_grad
 
