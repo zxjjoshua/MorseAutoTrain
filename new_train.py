@@ -77,7 +77,6 @@ def train_model():
                             rnn_optimizer.zero_grad()
                             rnn_out, rnn_h = rnn(input_tensor.float())
                             rnn_out_copy=torch.clone(rnn_out)
-                            print(type(rnn_out_copy))
                             train_out+=rnn_out_copy.tolist()
                             rnn_loss = Loss_Function(rnn_out)
                             rnn_loss.backward()
@@ -162,8 +161,6 @@ def train_model():
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i += 1
-        if cur_turn==10:
-            break
     f.close()
 
     with open('./Data/train.out', 'w') as f:
