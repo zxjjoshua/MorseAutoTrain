@@ -16,6 +16,7 @@ import event.event_parser as ep
 from event.event_parser import EventParser
 from morse import Morse
 from data_loader import DataLoader
+import json
 
 def train_model():
     logger = getLogger("train mode")
@@ -41,6 +42,10 @@ def train_model():
     i = 0
     max_event_per_epoch = 100
     event_num = 0
+
+    # training data
+    train_out=[]
+
     while True:
         # print(len(gv.processNodeSet))
         line = f.readline()
@@ -68,6 +73,7 @@ def train_model():
                             rnn.train()
                             rnn_optimizer.zero_grad()
                             rnn_out, rnn_h = rnn(input_tensor.float())
+                            train_out.append(rnn_out)
                             rnn_loss = Loss_Function(rnn_out)
                             rnn_loss.backward()
                             rnn_grad = input_tensor.grad
@@ -151,6 +157,9 @@ def train_model():
                         gv.set_processNode(newNode.id, newNode)
         i += 1
     f.close()
+
+    with open('./Data/train.out', 'w') as f:
+        json.dump(f, train_out)
 
     return rnn_grad
 
