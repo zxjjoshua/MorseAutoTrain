@@ -122,7 +122,7 @@ def predict(rnn):
             input_tensor = torch.tensor(cur_batch)
             input_tensor = input_tensor.to(gv.device)
             input_tensor.requires_grad = True
-            json.dump(cur_batch, f)
+            json.dump(cur_batch.tolist(), f)
             out, h = rnn(input_tensor.float())
             out_batches.append(out)
             cur_batch = remain_batch[::]
