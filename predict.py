@@ -125,7 +125,7 @@ def predict(rnn):
             tmp=[]
             for input in input_tensor:
                 tmp.append(input.tolist())
-            print(tmp)
+            # print(tmp)
             json.dump(tmp, f)
             out, h = rnn(input_tensor.float())
             out_batches.append(out)
