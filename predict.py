@@ -105,7 +105,7 @@ def predict(rnn):
     remain_batch = []
     out_batches = []
 
-    f=open('morse.out', 'w')
+    f=open('./Data/morse.out', 'w')
 
     for node_id in process_node_list:
         node = process_node_list[node_id]
