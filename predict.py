@@ -104,6 +104,7 @@ def predict(rnn):
     cur_batch = []
     remain_batch = []
     out_batches = []
+    tmp_out_batches=[]
 
     f=open('./Data/morse.out', 'w')
 
@@ -126,11 +127,12 @@ def predict(rnn):
             for input in input_tensor:
                 tmp.append(input.tolist())
             # print(tmp)
-            json.dump(tmp, f)
+            tmp_out_batches.append(tmp)
             out, h = rnn(input_tensor.float())
             out_batches.append(out)
             cur_batch = remain_batch[::]
             cur_len = len(cur_batch)
             remain_batch = []
-
+    json.dump(tmp_out_batches, f)
+    f.close()
     return out_batches
