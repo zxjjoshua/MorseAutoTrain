@@ -53,7 +53,7 @@ def predict_entry():
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    tmp=predict(rnn)
+                    tmp=predict(rnn, len(out_batches))
                     out_batches.append(tmp)
                     event_num = 0
             elif record.type == -1:
@@ -97,7 +97,7 @@ def predict_entry():
 
     return out_batches
 
-def predict(rnn):
+def predict(rnn, index):
     process_node_list = gv.processNodeSet
     # generate sequence
     cur_len = 0
@@ -106,7 +106,7 @@ def predict(rnn):
     out_batches = []
     tmp_out_batches=[]
 
-    f=open('./Data/morse.out', 'w')
+
 
     for node_id in process_node_list:
         node = process_node_list[node_id]
@@ -133,6 +133,8 @@ def predict(rnn):
             cur_batch = remain_batch[::]
             cur_len = len(cur_batch)
             remain_batch = []
-    json.dump(tmp_out_batches, f)
-    f.close()
+    if index in [50, 100, 200, 800]:
+        f = open('./Data/morse_' + str(index) + '.out', 'w')
+        json.dump(tmp_out_batches, f)
+        f.close()
     return out_batches
