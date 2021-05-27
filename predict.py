@@ -15,6 +15,7 @@ from RNN import Comp_Loss
 from logging import getLogger
 import json
 
+
 def predict_entry():
     logger = getLogger("test mode")
     device = gv.device
@@ -24,7 +25,6 @@ def predict_entry():
     activation_relu = torch.nn.ReLU()
     Loss_Function = Comp_Loss
     Learning_Rate = 0.001
-
 
     # models initialization
     # data_loader = DataLoader(processNodeSet=gv.processNodeSet)
@@ -53,7 +53,7 @@ def predict_entry():
 
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    tmp=predict(rnn, len(out_batches))
+                    tmp = predict(rnn, len(out_batches))
                     out_batches.append(tmp)
                     event_num = 0
             elif record.type == -1:
@@ -64,7 +64,7 @@ def predict_entry():
                         logger.error("failed to get file node")
                         continue
                     if gv.exist_fileNode(newNode.id):
-#                        logger.error("duplicate file node: " + str(newNode.id))
+                        #                        logger.error("duplicate file node: " + str(newNode.id))
                         pass
                     else:
                         gv.set_fileNode(newNode.id, newNode)
@@ -75,7 +75,7 @@ def predict_entry():
                         logger.error("failed to get file node")
                         continue
                     if gv.exist_fileNode(newNode.id):
- #                       logger.error("duplicate file node: " + str(newNode.id))
+                        #                       logger.error("duplicate file node: " + str(newNode.id))
                         pass
                     else:
                         gv.set_fileNode(newNode.id, newNode)
@@ -97,6 +97,7 @@ def predict_entry():
 
     return out_batches
 
+
 def predict(rnn, index):
     process_node_list = gv.processNodeSet
     # generate sequence
@@ -104,9 +105,7 @@ def predict(rnn, index):
     cur_batch = []
     remain_batch = []
     out_batches = []
-    tmp_out_batches=[]
-
-
+    tmp_out_batches = []
 
     for node_id in process_node_list:
         node = process_node_list[node_id]
@@ -123,7 +122,7 @@ def predict(rnn, index):
             input_tensor = torch.tensor(cur_batch)
             input_tensor = input_tensor.to(gv.device)
             input_tensor.requires_grad = True
-            tmp=[]
+            tmp = []
             for input in input_tensor:
                 tmp.append(input.tolist())
             # print(tmp)

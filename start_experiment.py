@@ -104,7 +104,7 @@ def start_experiment(config="config.json"):
         save_evaluation_results(precision, recall, accuracy, f1)
 '''
         # print(len(out_batches))
-        tmp_batches=[] 
+        tmp_batches=[]
         with open(args.data_saved_path+"/data.txt", "w") as fp:
             tmp_batches=[]
             for cur_snapshot in out_batches:
