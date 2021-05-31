@@ -1,5 +1,7 @@
 from utils import readObj
 
+malicious_id=[7681408, 7704960, 7961984, 8574336, 9117824, 9206400, 9581696, 9605760, 9721728, 9758080, 9802880, 9904256, 10360960, 10378368, 10488192, 11339136, 51257216]
+
 def prepare_gold_labels():
     nk_malicious_ids = []
     gold_labels = []

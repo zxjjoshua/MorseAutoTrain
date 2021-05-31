@@ -146,3 +146,30 @@ class ProcessNode:
         # if total_len < batch_size:
         #     res += [[]] * (batch_size - total_len)
         return res
+
+    def generate_malicious_mark(self, batch_size=100, sequence_size=5):
+        """
+        :param batch_size: how many sequences in a batch
+        :param sequence_size: how long a sequence is
+        :return: malicious marker list, a boolean sequence list. This method is used in visualize testing, to locate where malicious points are
+        """
+        from prepare_gold_labels import malicious_id
+        if self.seq_len < sequence_size:
+            return []
+        res = []
+        total_len = min(batch_size, self.seq_len - sequence_size + 1)
+
+        malicious_marker_list = [False] * self.seq_len
+        has_malicious=False
+
+        for i in range(self.seq_len):
+            if self.event_id_list[i] in malicious_id:
+                malicious_marker_list[i]=True
+                has_malicious=True
+
+        if not has_malicious:
+            return [[False]*sequence_size for _ in range(total_len)]
+
+        for i in range(total_len):
+            res.append(malicious_marker_list[i:i + sequence_size])
+        return res

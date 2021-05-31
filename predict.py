@@ -14,6 +14,7 @@ from utils import *
 from RNN import Comp_Loss
 from logging import getLogger
 import json
+from prepare_gold_labels import malicious_id
 
 
 def predict_entry():
@@ -39,6 +40,11 @@ def predict_entry():
     max_event_per_epoch = 100
     event_num = 0
     out_batches = []
+    malicious_batches = []
+
+    snapshot_id = 0
+    has_malicious = False
+
     while True:
         line = f.readline()
         if not line:
@@ -50,12 +56,21 @@ def predict_entry():
                 # event type
                 event_num += 1
                 event_parser.parse(record, morse)
-
+                if record.Id in malicious_id:
+                    has_malicious = True
+                    print("event " + str(record.Id) + " was captured in snapshot " + str(snapshot_id))
                 # process batch-wise
                 if event_num == max_event_per_epoch:
-                    tmp = predict(rnn, len(out_batches))
-                    out_batches.append(tmp)
+                    tmp_out, tmp_malicious = predict(rnn, snapshot_id, has_malicious)
+                    snapshot_id += 1
+                    if has_malicious:
+                        # tmp_malicious should be n * 3
+                        malicious_batches.append(tmp_malicious)
+                        # malicious_batches should be m * n * 3, where m is the number of snapshots
+                        #  containing malicious events
+                    out_batches.append(tmp_out)
                     event_num = 0
+                    has_malicious = False
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
@@ -94,46 +109,96 @@ def predict_entry():
                     else:
                         gv.set_processNode(newNode.id, newNode)
         i += 1
+    f.close()
 
+    # dump malicious data points
+    if len(malicious_batches) > 0:
+        with open('./Data/malicious_data.out', 'w+') as out_f:
+            json.dump(malicious_batches, out_f)
     return out_batches
 
 
-def predict(rnn, index):
+def predict(rnn, snapshot_id, has_malicious):
     process_node_list = gv.processNodeSet
     # generate sequence
     cur_len = 0
     cur_batch = []
     remain_batch = []
     out_batches = []
-    tmp_out_batches = []
+    malicious_out = []
+    cur_malicious_mark = []
+    remain_malicious_mark = []
 
-    for node_id in process_node_list:
-        node = process_node_list[node_id]
-        sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
-        need = gv.batch_size - cur_len
-        if len(sequence) + cur_len > gv.batch_size:
-            cur_batch += sequence[:need]
-            cur_len = gv.batch_size
-            remain_batch = sequence[need:]
-        else:
-            cur_batch += sequence[:need]
-            cur_len += len(sequence)
-        if cur_len >= gv.batch_size:
-            input_tensor = torch.tensor(cur_batch)
-            input_tensor = input_tensor.to(gv.device)
-            input_tensor.requires_grad = True
-            tmp = []
-            for input in input_tensor:
-                tmp.append(input.tolist())
-            # print(tmp)
-            tmp_out_batches.append(tmp)
-            out, h = rnn(input_tensor.float())
-            out_batches.append(out)
-            cur_batch = remain_batch[::]
-            cur_len = len(cur_batch)
-            remain_batch = []
-    if index in [50, 100, 200, 800]:
-        f = open('./Data/morse_' + str(index) + '.out', 'w')
-        json.dump(tmp_out_batches, f)
-        f.close()
-    return out_batches
+    if has_malicious:
+        for node_id in process_node_list:
+            node = process_node_list[node_id]
+            sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+            tmp_malicious_mark = node.generate_malicious_mark(gv.batch_size, gv.sequence_size)
+            need = gv.batch_size - cur_len
+            if len(sequence) + cur_len > gv.batch_size:
+                cur_batch += sequence[:need]
+                cur_len = gv.batch_size
+                cur_malicious_mark += tmp_malicious_mark[:need]
+                remain_batch = sequence[need:]
+                remain_malicious_mark = tmp_malicious_mark[need:]
+            else:
+                cur_batch += sequence[:need]
+                cur_malicious_mark += tmp_malicious_mark[:need]
+                cur_len += len(sequence)
+            if cur_len >= gv.batch_size:
+                input_tensor = torch.tensor(cur_batch)
+                input_tensor = input_tensor.to(gv.device)
+                input_tensor.requires_grad = True
+                ''' morse output for visualize testing
+                # tmp = []
+                # for input in input_tensor:
+                #     tmp.append(input.tolist())
+                # print(tmp)
+                # tmp_out_batches.append(tmp)
+                '''
+                out, h = rnn(input_tensor.float())
+                out_batches.append(out)
+
+                for seq_idx in range(gv.batch_size):
+                    for element_idx in range(gv.sequence_size):
+                        if cur_malicious_mark[seq_idx][element_idx]:
+                            malicious_out.append(out[seq_idx][element_idx])
+
+                cur_batch = remain_batch[::]
+                cur_malicious_mark = remain_malicious_mark[::]
+                cur_len = len(cur_batch)
+                remain_batch = []
+                remain_malicious_mark = []
+    else:
+        for node_id in process_node_list:
+            node = process_node_list[node_id]
+            sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
+            need = gv.batch_size - cur_len
+            if len(sequence) + cur_len > gv.batch_size:
+                cur_batch += sequence[:need]
+                cur_len = gv.batch_size
+                remain_batch = sequence[need:]
+            else:
+                cur_batch += sequence[:need]
+                cur_len += len(sequence)
+            if cur_len >= gv.batch_size:
+                input_tensor = torch.tensor(cur_batch)
+                input_tensor = input_tensor.to(gv.device)
+                input_tensor.requires_grad = True
+                ''' morse output for visualize testing
+                # tmp = []
+                # for input in input_tensor:
+                #     tmp.append(input.tolist())
+                # print(tmp)
+                # tmp_out_batches.append(tmp)
+                '''
+                out, h = rnn(input_tensor.float())
+                out_batches.append(out)
+                cur_batch = remain_batch[::]
+                cur_len = len(cur_batch)
+                remain_batch = []
+    # if has_malicious:
+    #     f = open('./Data/morse_' + str(snapshot_id) + '.out', 'a+')
+    #     json.dump(tmp_out_batches, f)
+    #     f.close()
+    return [out_batches, malicious_out]
