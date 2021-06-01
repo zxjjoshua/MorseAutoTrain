@@ -169,7 +169,7 @@ class ProcessNode:
 
         if not has_malicious:
             return [[False]*sequence_size for _ in range(total_len)]
-
+        print(malicious_marker_list)
         for i in range(total_len):
             res.append(malicious_marker_list[i:i + sequence_size])
         return res
