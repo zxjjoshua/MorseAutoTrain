@@ -154,8 +154,7 @@ class ProcessNode:
         :return: malicious marker list, a boolean sequence list. This method is used in visualize testing, to locate where malicious points are
         """
         from prepare_gold_labels import malicious_id
-        if self.seq_len < sequence_size:
-            return []
+
         res = []
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
 
@@ -170,6 +169,9 @@ class ProcessNode:
         if not has_malicious:
             return [[False]*sequence_size for _ in range(total_len)]
         print(malicious_marker_list)
+        if self.seq_len < sequence_size:
+            return []
+
         for i in range(total_len):
             res.append(malicious_marker_list[i:i + sequence_size])
         return res

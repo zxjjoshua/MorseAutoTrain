@@ -133,7 +133,7 @@ def predict(rnn, snapshot_id, has_malicious):
         for node_id in process_node_list:
             node = process_node_list[node_id]
             sequence = node.generate_sequence(gv.batch_size, gv.sequence_size)
-            print("has_malicious")
+            # print("has_malicious")
             tmp_malicious_mark = node.generate_malicious_mark(gv.batch_size, gv.sequence_size)
             need = gv.batch_size - cur_len
             if len(sequence) + cur_len > gv.batch_size:
