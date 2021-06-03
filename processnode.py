@@ -124,7 +124,9 @@ class ProcessNode:
         :return: a batch of sequences
         """
         if self.seq_len < sequence_size:
-            return [[np.append(self.state_list, -np.ones(sequence_size-self.seq_len))]]
+            need_padding_len=sequence_size-self.seq_len
+            padding_element=-np.ones([need_padding_len,12])
+            return [[np.append(self.state_list, padding_element)]]
         res = []
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
         for i in range(total_len):
