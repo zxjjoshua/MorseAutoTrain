@@ -126,7 +126,7 @@ class ProcessNode:
         if self.seq_len < sequence_size:
             need_padding_len=sequence_size-self.seq_len
             padding_element=-np.ones(12)
-            return [[self.state_list+ [padding_element]*need_padding_len]]
+            return [self.state_list+ [padding_element]*need_padding_len]
         res = []
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
         for i in range(total_len):
