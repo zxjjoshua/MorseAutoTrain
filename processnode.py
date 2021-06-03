@@ -124,7 +124,7 @@ class ProcessNode:
         :return: a batch of sequences
         """
         if self.seq_len < sequence_size:
-            return [np.append(self.state_list, -np.ones(sequence_size-self.seq_len))]
+            return [[np.append(self.state_list, -np.ones(sequence_size-self.seq_len))]]
         res = []
         total_len = min(batch_size, self.seq_len - sequence_size + 1)
         for i in range(total_len):
@@ -170,7 +170,7 @@ class ProcessNode:
             return [[False]*sequence_size for _ in range(total_len)]
         print(malicious_marker_list)
         if self.seq_len < sequence_size:
-            return [malicious_marker_list+[False]*(sequence_size-self.seq_len)]
+            return [[malicious_marker_list+[False]*(sequence_size-self.seq_len)]]
 
         for i in range(total_len):
             res.append(malicious_marker_list[i:i + sequence_size])
