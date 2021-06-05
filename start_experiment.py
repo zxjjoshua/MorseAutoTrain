@@ -70,7 +70,8 @@ def start_experiment(config="config.json"):
         test_id = paths_setting(args.load_model_from, mode="test")
         save_hyperparameters(args, "test")
         out_batches = predict_entry()
-        '''losses = []
+
+        losses = []
         for out_batch in out_batches:
             out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
             batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
@@ -100,7 +101,9 @@ def start_experiment(config="config.json"):
         print(f"classification boundary threshold: {args.classify_boundary_threshold}")
         precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
         save_evaluation_results(precision, recall, accuracy, f1)
-        '''
+
+
+
         # print(len(out_batches))
 
         # tmp_batches=[]
