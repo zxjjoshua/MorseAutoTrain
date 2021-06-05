@@ -169,6 +169,7 @@ def predict(rnn, snapshot_id, has_malicious):
                                 malicious_out.append(out[seq_idx][element_idx])
                 except Exception as e:
                     print(seq_idx, element_idx)
+                    print(cur_malicious_mark[seq_idx])
                     import sys
                     sys.exit(0)
 
