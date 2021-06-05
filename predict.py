@@ -146,6 +146,7 @@ def predict(rnn, snapshot_id, has_malicious):
                 cur_batch += sequence[:need]
                 cur_malicious_mark += tmp_malicious_mark[:need]
                 cur_len += len(sequence)
+            print(len(cur_malicious_mark))
             if cur_len >= gv.batch_size:
                 input_tensor = torch.tensor(cur_batch)
                 input_tensor = input_tensor.to(gv.device)
