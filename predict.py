@@ -162,10 +162,19 @@ def predict(rnn, snapshot_id, has_malicious):
                 print("cur_malicious_mark")
                 print(len(cur_malicious_mark))
                 print(len(cur_malicious_mark[0]))
-                for seq_idx in range(gv.batch_size):
-                    for element_idx in range(gv.sequence_size):
-                        if cur_malicious_mark[seq_idx][element_idx]:
-                            malicious_out.append(out[seq_idx][element_idx])
+                try:
+                    for seq_idx in range(gv.batch_size):
+                        for element_idx in range(gv.sequence_size):
+                            if cur_malicious_mark[seq_idx][element_idx]:
+                                malicious_out.append(out[seq_idx][element_idx])
+                except Exception as e:
+                    print(seq_idx, element_idx)
+                    import sys
+                    sys.exit(0)
+
+
+
+
 
                 cur_batch = remain_batch[::]
                 cur_malicious_mark = remain_malicious_mark[::]
