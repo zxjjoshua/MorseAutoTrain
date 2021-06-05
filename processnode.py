@@ -158,7 +158,7 @@ class ProcessNode:
         from prepare_gold_labels import malicious_id
 
         res = []
-        total_len = min(batch_size, self.seq_len - sequence_size + 1)
+        total_len = min(batch_size, self.seq_len - sequence_size + 1, sequence_size)
 
         malicious_marker_list = [False] * self.seq_len
         has_malicious=False
