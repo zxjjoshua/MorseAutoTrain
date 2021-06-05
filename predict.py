@@ -146,7 +146,6 @@ def predict(rnn, snapshot_id, has_malicious):
                 cur_batch += sequence[:need]
                 cur_malicious_mark += tmp_malicious_mark[:need]
                 cur_len += len(sequence)
-            print(len(tmp_malicious_mark))
             if cur_len >= gv.batch_size:
                 input_tensor = torch.tensor(cur_batch)
                 input_tensor = input_tensor.to(gv.device)
@@ -160,7 +159,6 @@ def predict(rnn, snapshot_id, has_malicious):
                 '''
                 out, h = rnn(input_tensor.float())
                 out_batches.append(out)
-                print(cur_malicious_mark)
                 for seq_idx in range(gv.batch_size):
                     for element_idx in range(gv.sequence_size):
                         if cur_malicious_mark[seq_idx][element_idx]:
