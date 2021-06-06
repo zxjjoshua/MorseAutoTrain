@@ -159,9 +159,6 @@ def predict(rnn, snapshot_id, has_malicious):
                 '''
                 out, h = rnn(input_tensor.float())
                 out_batches.append(out)
-                print("cur_malicious_mark")
-                print(len(cur_malicious_mark))
-                print(len(cur_malicious_mark[0]))
                 try:
                     for seq_idx in range(gv.batch_size):
                         if cur_malicious_mark[seq_idx]:
