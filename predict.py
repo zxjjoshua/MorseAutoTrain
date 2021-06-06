@@ -170,8 +170,7 @@ def predict(rnn, snapshot_id, has_malicious):
                 except Exception as e:
                     print(seq_idx, element_idx)
                     print(cur_malicious_mark[seq_idx])
-                    print(out[seq_idx])
-                    print(e.__traceback__)
+                    print(out[seq_idx], out[seq_idx-1], out[seq_idx+1])
                     import sys
                     sys.exit(0)
 
