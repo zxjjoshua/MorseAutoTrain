@@ -153,7 +153,7 @@ class ProcessNode:
         """
         :param batch_size: how many sequences in a batch
         :param sequence_size: how long a sequence is
-        :return: malicious marker list, a boolean sequence list. This method is used in visualize testing, to locate where malicious points are
+        :return: malicious marker list, a boolean list. This method is used in visualize testing, to locate where malicious points are
         """
         from prepare_gold_labels import malicious_id
 
@@ -171,11 +171,16 @@ class ProcessNode:
                 has_malicious=True
 
         if not has_malicious:
-            return [[False]*sequence_size for _ in range(total_len)]
+            return [False for _ in range(total_len)]
         # print(malicious_marker_list)
         if self.seq_len < sequence_size:
-            return [[malicious_marker_list+[False]*(sequence_size-self.seq_len)]]
+            return [False]
 
-        for i in range(total_len):
-            res.append(malicious_marker_list[i:i + sequence_size])
+        for i in range(total_len-sequence_size):
+            is_mali=False
+            for j in range(sequence_size):
+                is_mali=is_mali|malicious_marker_list[i+j]
+                if is_mali:
+                    break
+            res.append(is_mali)
         return res
