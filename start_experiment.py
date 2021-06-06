@@ -72,7 +72,11 @@ def start_experiment(config="config.json"):
         out_batches = predict_entry()
 
         losses = []
-        for out_batch in out_batches:
+        for snapshot in out_batches:
+            out_batch=[]
+            for tmp_batch in snapshot:
+                out_batch+=torch.clone(tmp_batch)
+            out_batch=torch.tensor(out_batch)
             out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
             batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
             # print(batch_avg.is_cuda)
