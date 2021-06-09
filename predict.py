@@ -74,7 +74,6 @@ def predict_entry():
 
                     if snapshot_id>180:
                         return out_batches
-
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
