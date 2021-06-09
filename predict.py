@@ -71,9 +71,9 @@ def predict_entry():
                     out_batches.append(tmp_out)
                     event_num = 0
                     has_malicious = False
-
-                    if snapshot_id>180:
-                        return out_batches
+                    #
+                    # if snapshot_id>180:
+                    #     return out_batches
             elif record.type == -1:
                 # file node
                 if 0 < record.subtype < 5:
