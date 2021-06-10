@@ -75,8 +75,8 @@ def start_experiment(config="config.json"):
         for snapshot in out_batches:
             out_batch=torch.empty(0)
             for tmp_batch in snapshot:
-                out_batch=torch.cat([out_batch, tmp_batch])
-            out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
+                out_batch=torch.cat([out_batch, torch.clone(tmp_batch)])
+            out_copy = out_batch  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
             batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
             # print(batch_avg.is_cuda)
             # print(torch.tensor([out.shape[1]]).is_cuda)
