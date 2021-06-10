@@ -71,12 +71,11 @@ def start_experiment(config="config.json"):
         save_hyperparameters(args, "test")
         out_batches = predict_entry()
 
-        '''
         losses = []
         for snapshot in out_batches:
-            out_batch=[]
+            out_batch=torch.empty(0)
             for tmp_batch in snapshot:
-                out_batch+=torch.clone(tmp_batch)
+                out_batch=torch.cat([out_batch, tmp_batch])
             out_copy = torch.clone(out_batch)  ## m by n by j, where m = # of batches, n = # of sequences in each batch, and j = output_dim
             batch_avg = torch.mean(out_copy, 1, True)  ## m by 1 by j
             # print(batch_avg.is_cuda)
@@ -105,23 +104,22 @@ def start_experiment(config="config.json"):
         print(f"classification boundary threshold: {args.classify_boundary_threshold}")
         precision, recall, accuracy, f1 = evaluate_classification(pred_labels, gold_labels)
         save_evaluation_results(precision, recall, accuracy, f1)
-        '''
 
 
-        print(len(out_batches))
-
-        tmp_batches=[]
-        with open(args.data_saved_path+"/data.txt", "w") as fp:
-            tmp_batches=[]
-            for cur_snapshot in out_batches:
-                tmp=[]
-                for rnn_node in cur_snapshot:
-                    # print(type(rnn_node))
-                    rnn_node_copy=torch.clone(rnn_node)
-                    tmp.append(rnn_node_copy.tolist())
-                tmp_batches.append(tmp)
-            json.dump(tmp_batches, fp)
-        
+        # print(len(out_batches))
+        #
+        # tmp_batches=[]
+        # with open(args.data_saved_path+"/data.txt", "w") as fp:
+        #     tmp_batches=[]
+        #     for cur_snapshot in out_batches:
+        #         tmp=[]
+        #         for rnn_node in cur_snapshot:
+        #             # print(type(rnn_node))
+        #             rnn_node_copy=torch.clone(rnn_node)
+        #             tmp.append(rnn_node_copy.tolist())
+        #         tmp_batches.append(tmp)
+        #     json.dump(tmp_batches, fp)
+        #
 
 
 def paths_setting(save_models_dirname, mode="train"):
